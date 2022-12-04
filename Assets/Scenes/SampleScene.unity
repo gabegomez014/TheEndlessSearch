@@ -176,10 +176,12 @@ MonoBehaviour:
   SpeedRot: 20
   SpeedMove: 15
   JumpMove: 15
+  DodgeSpeed: 60
+  DodgeTime: 1
   CameraAimOffset: 2.5
   CameraLookAtOffset: 1
   term: 1
-  isJump: 0
+  _isJump: 0
 --- !u!54 &180645159
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -189,12 +191,12 @@ Rigidbody:
   m_GameObject: {fileID: 180645156}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 0
+  m_Drag: 5
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!1 &330585543
 GameObject:
@@ -1007,7 +1009,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 7a1147f5255a0914cb344945844db917,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7a1147f5255a0914cb344945844db917,
         type: 3}
@@ -1017,7 +1019,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 7a1147f5255a0914cb344945844db917,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7a1147f5255a0914cb344945844db917,
         type: 3}
@@ -1032,7 +1034,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 7a1147f5255a0914cb344945844db917,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7a1147f5255a0914cb344945844db917,
         type: 3}

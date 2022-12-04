@@ -23,6 +23,12 @@ public class PlayerController : MonoBehaviour
     [Header("Movement speed during jump")]
     public float JumpMove;
 
+    [Header("Dodge speed")]
+    public float DodgeSpeed;
+
+    [Header("How long player moves by dodge speed")]
+    public float DodgeTime;
+
     [Header("Camera Aim Offset")]
     public float CameraAimOffset;
 
@@ -32,13 +38,19 @@ public class PlayerController : MonoBehaviour
     [Header("Time available for combo")]
     public int term;
 
-    public bool isJump;
+    public bool _isJump;
 
     private Animator _anim;
 
-    private float _dir;
+    private float _dir = 1;
 
     private CinemachineComposer _transposer;
+    
+    private Rigidbody _rb;
+
+    private bool _dodging;
+
+    private float _currentDodgeTime;
 
     private void Start() {
         if (PlayerModel) {
@@ -52,6 +64,10 @@ public class PlayerController : MonoBehaviour
         } else {
             Debug.LogWarning("Need to attach Virtual Camera");
         }
+
+        _rb = GetComponent<Rigidbody>();
+
+        _dodging = false;
     }
 
     private void Update()
@@ -59,11 +75,11 @@ public class PlayerController : MonoBehaviour
         Rotate();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
-        if (!isJump)
+        if (!_isJump)
         {            
             // Attack();
             
-            // Dodge();
+            Dodge();
             
             // Jump();
         }
@@ -127,7 +143,7 @@ public class PlayerController : MonoBehaviour
     
     void Move()
     {
-        if (isJump)
+        if (_isJump)
         {            
             transform.position += transform.forward * JumpMove * Time.deltaTime;            
             _anim.SetBool("Run", false);
@@ -137,9 +153,32 @@ public class PlayerController : MonoBehaviour
         else
         {   
             transform.position = transform.position + new Vector3(_dir * SpeedMove, 0, 0) * Time.deltaTime;
-            // transform.position = new Vector3(transform.position.x  )
             _anim.SetBool("Run", true);
                 _anim.SetBool("Walk", Input.GetKey(KeyCode.LeftControl));
         }
+    }
+
+    void Dodge()
+    {
+        
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            _currentDodgeTime = DodgeTime;
+            _dodging = true;
+            _rb.AddForce(new Vector3(_dir * DodgeSpeed, 0, 0), ForceMode.Impulse);
+            _anim.SetTrigger("Dodge");
+            StartCoroutine(DodgeCooldown());
+        }
+    }
+
+    IEnumerator DodgeCooldown() {
+        while(_currentDodgeTime <= 0) {
+            yield return null;
+
+            _currentDodgeTime -= Time.deltaTime;
+        }
+
+        Debug.Log("Hit it ");
+        _rb.velocity = new Vector3(0,0,0);
     }
 }
