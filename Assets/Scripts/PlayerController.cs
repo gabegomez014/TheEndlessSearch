@@ -20,14 +20,17 @@ public class PlayerController : MonoBehaviour
     [Header("Movement speed")]
     public float SpeedMove;
 
+    [Header("Max Jump height")]
+    public float MaxJumpHeight;
+
     [Header("Movement speed during jump")]
     public float JumpMove;
 
+    [Header("Drag on Player Jump")]
+    public float CounterJumpForce;
+
     [Header("Dodge speed")]
     public float DodgeSpeed;
-
-    [Header("How long player moves by dodge speed")]
-    public float DodgeTime;
 
     [Header("Camera Aim Offset")]
     public float CameraAimOffset;
@@ -40,6 +43,8 @@ public class PlayerController : MonoBehaviour
 
     public bool _isJump;
 
+    private bool _jumpKeyHeld;
+
     private Animator _anim;
 
     private float _dir = 1;
@@ -48,9 +53,8 @@ public class PlayerController : MonoBehaviour
     
     private Rigidbody _rb;
 
-    private bool _dodging;
-
-    private float _currentDodgeTime;
+    float _raycastDistance = 1;
+    RaycastHit _hit;
 
     private void Start() {
         if (PlayerModel) {
@@ -67,7 +71,7 @@ public class PlayerController : MonoBehaviour
 
         _rb = GetComponent<Rigidbody>();
 
-        _dodging = false;
+        _jumpKeyHeld = false;
     }
 
     private void Update()
@@ -75,19 +79,45 @@ public class PlayerController : MonoBehaviour
         Rotate();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
+
+
         if (!_isJump)
         {            
             // Attack();
             
             Dodge();
             
-            // Jump();
+            Jump();
         }
+
+        else if (_isJump && _jumpKeyHeld) {
+            if (Input.GetKeyUp(KeyCode.Space)) {
+                _jumpKeyHeld = false;
+            } else if (_rb.velocity.y < 0) {
+                Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
+                if (_hit.distance <= 0.5f && _hit.transform.tag == "Ground") {
+                    _isJump = false;
+                    _jumpKeyHeld = false;
+                    _anim.SetBool("IsGrounded", true);
+                }
+            }
+        }
+
+        else if (_isJump && !_jumpKeyHeld) {
+            Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
+            if (_hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.tag == "Ground") {
+                _isJump = false;
+                _anim.SetBool("IsGrounded", true);
+            } else {
+                _rb.AddForce(new Vector3(0, CounterJumpForce) * _rb.mass);
+            }
+        }
+
     }
 
     Quaternion rot;
     bool isRun;
-    
+
     void Rotate()
     {
         if (Input.GetKey(KeyCode.D))
@@ -145,7 +175,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_isJump)
         {            
-            transform.position += transform.forward * JumpMove * Time.deltaTime;            
+            transform.position += new Vector3(_dir, 0, 0) * JumpMove * Time.deltaTime;            
             _anim.SetBool("Run", false);
                 _anim.SetBool("Walk", false);
 
@@ -163,22 +193,22 @@ public class PlayerController : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            _currentDodgeTime = DodgeTime;
-            _dodging = true;
             _rb.AddForce(new Vector3(_dir * DodgeSpeed, 0, 0), ForceMode.Impulse);
             _anim.SetTrigger("Dodge");
-            StartCoroutine(DodgeCooldown());
         }
     }
 
-    IEnumerator DodgeCooldown() {
-        while(_currentDodgeTime <= 0) {
-            yield return null;
-
-            _currentDodgeTime -= Time.deltaTime;
+    void Jump() {
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            _jumpKeyHeld = true;
+            _isJump = true;
+            _rb.AddForce(new Vector3(0, CalculateJumpForce()), ForceMode.Impulse);
+            _anim.SetTrigger("Jump");
+            _anim.SetBool("IsGrounded", false);
         }
+    }
 
-        Debug.Log("Hit it ");
-        _rb.velocity = new Vector3(0,0,0);
+    private float CalculateJumpForce() {
+        return Mathf.Sqrt(2 * Physics.gravity.magnitude * MaxJumpHeight);
     }
 }
