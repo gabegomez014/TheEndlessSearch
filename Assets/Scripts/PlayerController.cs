@@ -45,6 +45,8 @@ public class PlayerController : MonoBehaviour
 
     private bool _jumpKeyHeld;
 
+    private bool _isFalling;
+
     private Animator _anim;
 
     private float _dir = 1;
@@ -72,6 +74,7 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
 
         _jumpKeyHeld = false;
+        _isJump = false;
     }
 
     private void Update()
@@ -79,10 +82,17 @@ public class PlayerController : MonoBehaviour
         Rotate();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
-
-
-        if (!_isJump)
-        {            
+        if (!_isJump && !_isFalling)
+        {
+            Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
+            if (_hit.transform == null || _hit.transform.gameObject.layer != LayerMask.NameToLayer("Ground")) {
+                Debug.Log("Click");
+                _isFalling = true;
+                _anim.SetBool("IsFalling", true);
+                Falling();
+                return;
+            }
+                        
             // Attack();
             
             Dodge();
@@ -91,28 +101,14 @@ public class PlayerController : MonoBehaviour
         }
 
         else if (_isJump && _jumpKeyHeld) {
-            if (Input.GetKeyUp(KeyCode.Space)) {
-                _jumpKeyHeld = false;
-            } else if (_rb.velocity.y < 0) {
-                Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
-                if (_hit.distance <= 0.5f && _hit.transform.tag == "Ground") {
-                    _isJump = false;
-                    _jumpKeyHeld = false;
-                    _anim.SetBool("IsGrounded", true);
-                }
-            }
+            Jumping();
         }
 
         else if (_isJump && !_jumpKeyHeld) {
-            Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
-            if (_hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.tag == "Ground") {
-                _isJump = false;
-                _anim.SetBool("IsGrounded", true);
-            } else {
-                _rb.AddForce(new Vector3(0, CounterJumpForce) * _rb.mass);
-            }
+            Falling();
+        } else if (_isFalling) {
+            Falling();
         }
-
     }
 
     Quaternion rot;
@@ -205,6 +201,36 @@ public class PlayerController : MonoBehaviour
             _rb.AddForce(new Vector3(0, CalculateJumpForce()), ForceMode.Impulse);
             _anim.SetTrigger("Jump");
             _anim.SetBool("IsGrounded", false);
+        }
+    }
+
+    private void Jumping() {
+        if (Input.GetKeyUp(KeyCode.Space)) {
+            _jumpKeyHeld = false;
+        } else if (_rb.velocity.y < 0) {
+            _isFalling = true;
+            Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
+            if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+                _isJump = false;
+                _jumpKeyHeld = false;
+                _isFalling = false;
+                _anim.SetBool("IsGrounded", true);
+                _anim.SetBool("IsFalling", false);
+                CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
+            }
+        }
+    }
+
+    private void Falling() {
+        Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
+        if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+            _isJump = false;
+            _isFalling = false;
+            _anim.SetBool("IsGrounded", true);
+            _anim.SetBool("IsFalling", false);
+            CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
+        } else {
+            _rb.AddForce(new Vector3(0, CounterJumpForce) * _rb.mass);
         }
     }
 
