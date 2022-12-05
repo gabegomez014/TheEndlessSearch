@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Entity, IDamageable
 {
     [Header("Player Model to manipulate")]
     public GameObject PlayerModel;
@@ -51,14 +51,15 @@ public class PlayerController : MonoBehaviour
 
     private float _dir = 1;
 
-    private CinemachineComposer _transposer;
+    private CinemachineComposer _composer;
     
     private Rigidbody _rb;
 
     float _raycastDistance = 1;
     RaycastHit _hit;
 
-    private void Start() {
+    private new void Start() {
+        base.Start();
         if (PlayerModel) {
             _anim = PlayerModel.GetComponent<Animator>();
         } else {
@@ -66,7 +67,7 @@ public class PlayerController : MonoBehaviour
         }
 
         if (VCam) {
-            _transposer = VCam.GetCinemachineComponent<CinemachineComposer>();
+            _composer = VCam.GetCinemachineComponent<CinemachineComposer>();
         } else {
             Debug.LogWarning("Need to attach Virtual Camera");
         }
@@ -86,7 +87,6 @@ public class PlayerController : MonoBehaviour
         {
             Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
             if (_hit.transform == null || _hit.transform.gameObject.layer != LayerMask.NameToLayer("Ground")) {
-                Debug.Log("Click");
                 _isFalling = true;
                 _anim.SetBool("IsFalling", true);
                 Falling();
@@ -130,7 +130,7 @@ public class PlayerController : MonoBehaviour
 
             if (VCam) {
 
-                _transposer.m_TrackedObjectOffset = new Vector3(CameraAimOffset, _transposer.m_TrackedObjectOffset.y, _transposer.m_TrackedObjectOffset.z);
+                _composer.m_TrackedObjectOffset = new Vector3(CameraAimOffset, _composer.m_TrackedObjectOffset.y, _composer.m_TrackedObjectOffset.z);
             } else {
                 Debug.Log("Need to attach Virtual Camera");
             }
@@ -150,7 +150,7 @@ public class PlayerController : MonoBehaviour
             }
 
             if (VCam) {
-                _transposer.m_TrackedObjectOffset = new Vector3(-CameraAimOffset, _transposer.m_TrackedObjectOffset.y, _transposer.m_TrackedObjectOffset.z);
+                _composer.m_TrackedObjectOffset = new Vector3(-CameraAimOffset, _composer.m_TrackedObjectOffset.y, _composer.m_TrackedObjectOffset.z);
             } else {
                 Debug.Log("Need to attach Virtual Camera");
             }
@@ -236,5 +236,34 @@ public class PlayerController : MonoBehaviour
 
     private float CalculateJumpForce() {
         return Mathf.Sqrt(2 * Physics.gravity.magnitude * MaxJumpHeight);
+    }
+
+    public void TakeDamage(int damage) {
+        _currentHealth -= damage;
+        if (_currentHealth <= 0) {
+            _currentHealth = 0;
+            Die();
+        }
+    }
+    public void Heal(int heal) {
+        _currentHealth += heal;
+        if (_currentHealth > TotalHealth) {
+            _currentHealth = TotalHealth;
+        }
+    }
+
+    public void Die()
+    {
+        Destroy(this.gameObject);
+    }
+
+    public override void AttackAnticipation() {
+        throw new System.Exception("Attack anticipation not implemented");
+    }
+    public override void Attack() {
+        throw new System.Exception("Attack not implemented");
+    }
+    public override void AttackRecovery() {
+        throw new System.Exception("Attack recovery not implemented");
     }
 }
