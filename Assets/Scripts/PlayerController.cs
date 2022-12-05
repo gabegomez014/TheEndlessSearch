@@ -141,6 +141,7 @@ public class PlayerController : Entity, IDamageable
     {
         if (Input.GetKey(KeyCode.D))
         {           
+            _isHealing = false;
             _dir = 1;
             Move();            
             rot = Quaternion.LookRotation(Vector3.right);
@@ -162,6 +163,7 @@ public class PlayerController : Entity, IDamageable
         
         else if (Input.GetKey(KeyCode.A))
         {
+            _isHealing = false;
             _dir = -1;            
             Move();
             rot = Quaternion.LookRotation(Vector3.left);
@@ -330,6 +332,7 @@ public class PlayerController : Entity, IDamageable
 
         if ((_isHealing == false || !Input.GetKey(KeyCode.T)) && _currentHealTime > 0) {
             // Heal Canceled
+            _currentHealTime = HealTime;
             _anim.SetBool("Healing", false);
             yield break;
         }
