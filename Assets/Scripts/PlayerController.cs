@@ -196,7 +196,6 @@ public class PlayerController : Entity, IDamageable
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             StartCoroutine(Dodging());
-            // _rb.AddForce(new Vector3(_dir * DodgeSpeed, 0, 0), ForceMode.Impulse);
             _anim.SetTrigger("Dodge");
         }
     }
