@@ -171,14 +171,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21b5a9c2107404bf4be0cfb48f629ded, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TotalHealth: 10
+  TotalHealth: 50
+  TotalMana: 8
   PlayerModel: {fileID: 691566531}
   CameraLookAt: {fileID: 1191966248}
   VCam: {fileID: 905377280}
   SpeedRot: 20
   SpeedMove: 15
   MaxJumpHeight: 5
-  JumpMove: 15
+  JumpMove: 8
   CounterJumpForce: -4
   DodgeDistance: 5
   DodgeTime: 0.2
@@ -1253,7 +1254,7 @@ GameObject:
   - component: {fileID: 1172053243}
   - component: {fileID: 1172053242}
   m_Layer: 5
-  m_Name: CurrentHealth
+  m_Name: CurrentMana
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1357,6 +1358,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1293005045}
+  - component: {fileID: 1293005046}
   m_Layer: 0
   m_Name: UI
   m_TagString: Untagged
@@ -1380,6 +1382,20 @@ Transform:
   m_Father: {fileID: 1549323274}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1293005046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1293005044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 594c797e3369e4c7981d864e6d9c48e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  HealthBar: {fileID: 1095162670}
+  ManaBar: {fileID: 1172053242}
 --- !u!1 &1383610351
 GameObject:
   m_ObjectHideFlags: 3
@@ -1637,7 +1653,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 73fd769f4dd8b4ad7889095caca4283d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

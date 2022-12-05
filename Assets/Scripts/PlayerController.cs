@@ -35,6 +35,9 @@ public class PlayerController : Entity, IDamageable
     [Header("How long dodge state is active")]
     public float DodgeTime;
 
+    [Header("Time for player to cast heal")]
+    public float HealTime;
+
     [Header("Camera Aim Offset")]
     public float CameraAimOffset;
 
@@ -52,6 +55,8 @@ public class PlayerController : Entity, IDamageable
 
     private bool _isDodging;
 
+    private bool _isHealing;
+
     private Animator _anim;
 
     private float _dir = 1;
@@ -63,6 +68,7 @@ public class PlayerController : Entity, IDamageable
     float _raycastDistance = 1;
     RaycastHit _hit;
     float _currentDodgeTime;
+    float _currentHealTime;
 
     private new void Start() {
         base.Start();
@@ -82,6 +88,9 @@ public class PlayerController : Entity, IDamageable
 
         _jumpKeyHeld = false;
         _isJump = false;
+
+        GameUIManager.Instance.UpdateHealth(_currentHealth/TotalHealth);
+        GameUIManager.Instance.UpdateMana(_currentMana/TotalMana);
     }
 
     private void Update()
@@ -114,6 +123,16 @@ public class PlayerController : Entity, IDamageable
             Falling();
         } else if (_isFalling && !_isDodging) {
             Falling();
+        }
+
+        if (Input.GetKeyDown(KeyCode.H)) {
+            TakeDamage(8);
+        }
+
+        if (Input.GetKeyDown(KeyCode.T)) {
+            Heal(5);
+        } else if (Input.GetKeyUp(KeyCode.T)) {
+            _anim.ResetTrigger("HealEnd");
         }
     }
 
@@ -195,18 +214,22 @@ public class PlayerController : Entity, IDamageable
         
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
+            _isHealing = false;
             StartCoroutine(Dodging());
             _anim.SetTrigger("Dodge");
+            _anim.SetBool("Healing", false);
         }
     }
 
     void Jump() {
         if (Input.GetKeyDown(KeyCode.Space)) {
+            _isHealing = false;
             _jumpKeyHeld = true;
             _isJump = true;
             _rb.AddForce(new Vector3(0, CalculateJumpForce()), ForceMode.Impulse);
             _anim.SetTrigger("Jump");
             _anim.SetBool("IsGrounded", false);
+            _anim.SetBool("Healing", false);
         }
     }
 
@@ -249,17 +272,21 @@ public class PlayerController : Entity, IDamageable
     }
 
     public void TakeDamage(int damage) {
+        _isHealing = false;
         _currentHealth -= damage;
+        GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
         if (_currentHealth <= 0) {
             _currentHealth = 0;
             Die();
         }
+
+        _anim.SetTrigger("Hit");
+        _anim.SetBool("Healing", false);
     }
     public void Heal(int heal) {
-        _currentHealth += heal;
-        if (_currentHealth > TotalHealth) {
-            _currentHealth = TotalHealth;
-        }
+        _isHealing = true;
+        _anim.SetBool("Healing", true);
+        StartCoroutine(Healing(heal));
     }
 
     public void Die()
@@ -292,5 +319,32 @@ public class PlayerController : Entity, IDamageable
         }
 
         _isDodging = false;
+    }
+
+    IEnumerator Healing(int healAmount) {
+        _currentHealTime = HealTime;
+
+        while (_isHealing && Input.GetKey(KeyCode.T) && _currentHealTime > 0) {
+            _currentHealTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        if ((_isHealing == false || !Input.GetKey(KeyCode.T)) && _currentHealTime > 0) {
+            // Heal Canceled
+            _anim.SetBool("Healing", false);
+            yield break;
+        }
+
+        _currentHealth += healAmount;
+        if (_currentHealth > TotalHealth) {
+            _currentHealth = TotalHealth;
+        }
+        _anim.SetTrigger("HealEnd");
+        _anim.SetBool("Healing", false);
+        _isHealing = false;
+
+        yield return null;
+
+        GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
     }
 }
