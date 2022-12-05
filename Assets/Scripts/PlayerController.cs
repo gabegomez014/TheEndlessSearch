@@ -131,8 +131,6 @@ public class PlayerController : Entity, IDamageable
 
         if (Input.GetKeyDown(KeyCode.T)) {
             Heal(5);
-        } else if (Input.GetKeyUp(KeyCode.T)) {
-            _anim.ResetTrigger("HealEnd");
         }
     }
 
@@ -285,6 +283,7 @@ public class PlayerController : Entity, IDamageable
     }
     public void Heal(int heal) {
         _isHealing = true;
+        _anim.ResetTrigger("HealEnd");
         _anim.SetBool("Healing", true);
         StartCoroutine(Healing(heal));
     }
@@ -340,11 +339,9 @@ public class PlayerController : Entity, IDamageable
             _currentHealth = TotalHealth;
         }
         _anim.SetTrigger("HealEnd");
+        yield return null;
         _anim.SetBool("Healing", false);
         _isHealing = false;
-
-        yield return null;
-
         GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
     }
 }
