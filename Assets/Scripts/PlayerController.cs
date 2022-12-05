@@ -29,8 +29,11 @@ public class PlayerController : Entity, IDamageable
     [Header("Drag on Player Jump")]
     public float CounterJumpForce;
 
-    [Header("Dodge speed")]
-    public float DodgeSpeed;
+    [Header("How far dodge takes player forward")]
+    public float DodgeDistance;
+
+    [Header("How long dodge state is active")]
+    public float DodgeTime;
 
     [Header("Camera Aim Offset")]
     public float CameraAimOffset;
@@ -47,6 +50,8 @@ public class PlayerController : Entity, IDamageable
 
     private bool _isFalling;
 
+    private bool _isDodging;
+
     private Animator _anim;
 
     private float _dir = 1;
@@ -57,6 +62,7 @@ public class PlayerController : Entity, IDamageable
 
     float _raycastDistance = 1;
     RaycastHit _hit;
+    float _currentDodgeTime;
 
     private new void Start() {
         base.Start();
@@ -83,7 +89,7 @@ public class PlayerController : Entity, IDamageable
         Rotate();
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
-        if (!_isJump && !_isFalling)
+        if (!_isJump && !_isFalling && !_isDodging)
         {
             Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
             if (_hit.transform == null || _hit.transform.gameObject.layer != LayerMask.NameToLayer("Ground")) {
@@ -100,13 +106,13 @@ public class PlayerController : Entity, IDamageable
             Jump();
         }
 
-        else if (_isJump && _jumpKeyHeld) {
+        else if (_isJump && _jumpKeyHeld && !_isDodging) {
             Jumping();
         }
 
-        else if (_isJump && !_jumpKeyHeld) {
+        else if (_isJump && !_jumpKeyHeld && !_isDodging) {
             Falling();
-        } else if (_isFalling) {
+        } else if (_isFalling && !_isDodging) {
             Falling();
         }
     }
@@ -189,7 +195,8 @@ public class PlayerController : Entity, IDamageable
         
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            _rb.AddForce(new Vector3(_dir * DodgeSpeed, 0, 0), ForceMode.Impulse);
+            StartCoroutine(Dodging());
+            // _rb.AddForce(new Vector3(_dir * DodgeSpeed, 0, 0), ForceMode.Impulse);
             _anim.SetTrigger("Dodge");
         }
     }
@@ -238,6 +245,10 @@ public class PlayerController : Entity, IDamageable
         return Mathf.Sqrt(2 * Physics.gravity.magnitude * MaxJumpHeight);
     }
 
+    private float CalculateDodgeSpeed() {
+        return DodgeDistance / DodgeTime;
+    }
+
     public void TakeDamage(int damage) {
         _currentHealth -= damage;
         if (_currentHealth <= 0) {
@@ -265,5 +276,22 @@ public class PlayerController : Entity, IDamageable
     }
     public override void AttackRecovery() {
         throw new System.Exception("Attack recovery not implemented");
+    }
+
+    IEnumerator Dodging() {
+        _isDodging = true;
+        _currentDodgeTime = DodgeTime;
+        float speed = CalculateDodgeSpeed();
+
+        while(_currentDodgeTime > 0) {
+            Vector3 newPos = transform.position;
+            newPos.x += _dir * speed * Time.deltaTime;
+            transform.position = newPos;
+
+            _currentDodgeTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        _isDodging = false;
     }
 }
