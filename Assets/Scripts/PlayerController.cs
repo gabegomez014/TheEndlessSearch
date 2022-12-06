@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using MoreMountains.Feedbacks;
 using UnityEngine;
 using Cinemachine;
 
@@ -20,6 +21,9 @@ public class PlayerController : Entity, IDamageable
     [Header("Movement speed")]
     public float SpeedMove;
 
+    [Header("Feedback to play on Move")]
+    public MMF_Player MovePlayer;
+
     [Header("Max Jump height")]
     public float MaxJumpHeight;
 
@@ -29,14 +33,23 @@ public class PlayerController : Entity, IDamageable
     [Header("Drag on Player Jump")]
     public float CounterJumpForce;
 
+    [Header("Feedback to play on Jump")]
+    public MMF_Player JumpPlayer;
+
     [Header("How far dodge takes player forward")]
     public float DodgeDistance;
 
     [Header("How long dodge state is active")]
     public float DodgeTime;
 
+    [Header("Feedback to play on dodge")]
+    public MMF_Player DodgePlayer;
+
     [Header("Time for player to cast heal")]
     public float HealTime;
+
+    [Header("Feedback to play on Heal")]
+    public MMF_Player HealPlayer;
 
     [Header("Camera Aim Offset")]
     public float CameraAimOffset;
@@ -44,8 +57,11 @@ public class PlayerController : Entity, IDamageable
     [Header("Camera look at position offset")]
     public float CameraLookAtOffset;
 
-    [Header("Time available for combo")]
+    [Header("Time available for Attack combo")]
     public int term;
+
+    [Header("Feedback to play on being hit")]
+    public MMF_Player HitPlayer;
 
     public bool _isJump;
 
@@ -70,6 +86,8 @@ public class PlayerController : Entity, IDamageable
     float _currentDodgeTime;
     float _currentHealTime;
 
+    MMF_Sound _moveSound;
+
     private new void Start() {
         base.Start();
         if (PlayerModel) {
@@ -91,6 +109,8 @@ public class PlayerController : Entity, IDamageable
 
         GameUIManager.Instance.UpdateHealth(_currentHealth/TotalHealth);
         GameUIManager.Instance.UpdateMana(_currentMana/TotalMana);
+
+        _moveSound = MovePlayer.GetFeedbackOfType<MMF_Sound>();
     }
 
     private void Update()
@@ -131,6 +151,11 @@ public class PlayerController : Entity, IDamageable
 
         if (Input.GetKeyDown(KeyCode.T)) {
             Heal(5);
+        }
+
+        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D)) {
+            MovePlayer.StopFeedbacks();
+            _moveSound.Stop(transform.position);
         }
     }
 
@@ -203,6 +228,10 @@ public class PlayerController : Entity, IDamageable
         }
         else
         {   
+            if (!MovePlayer.IsPlaying) {
+                MovePlayer.PlayFeedbacks();
+                _moveSound.Play(transform.position);
+            }
             transform.position = transform.position + new Vector3(_dir * SpeedMove, 0, 0) * Time.deltaTime;
             _anim.SetBool("Run", true);
                 _anim.SetBool("Walk", Input.GetKey(KeyCode.LeftControl));
