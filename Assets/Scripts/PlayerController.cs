@@ -163,6 +163,7 @@ public class PlayerController : Entity, IDamageable
 
         else if (_isJump && _jumpKeyHeld && !_isDodging) {
             Jumping();
+            Dodge();
         }
 
         else if (_isJump && !_jumpKeyHeld && !_isDodging) {
@@ -283,7 +284,6 @@ public class PlayerController : Entity, IDamageable
 
     void Dodge()
     {
-        
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
             _isHealing = false;
@@ -298,6 +298,8 @@ public class PlayerController : Entity, IDamageable
             _isHealing = false;
             _jumpKeyHeld = true;
             _isJump = true;
+            JumpPlayer.PlayFeedbacks();
+
             _rb.AddForce(new Vector3(0, CalculateJumpForce()), ForceMode.Impulse);
             _anim.SetTrigger("Jump");
             _anim.SetBool("IsGrounded", false);
@@ -315,6 +317,7 @@ public class PlayerController : Entity, IDamageable
                 _isJump = false;
                 _jumpKeyHeld = false;
                 _isFalling = false;
+                JumpPlayer.StopFeedbacks();
                 _anim.SetBool("IsGrounded", true);
                 _anim.SetBool("IsFalling", false);
                 CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
@@ -327,6 +330,7 @@ public class PlayerController : Entity, IDamageable
         if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
             _isJump = false;
             _isFalling = false;
+            JumpPlayer.StopFeedbacks();
             _anim.SetBool("IsGrounded", true);
             _anim.SetBool("IsFalling", false);
             CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
