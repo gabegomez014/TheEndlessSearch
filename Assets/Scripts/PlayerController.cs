@@ -87,6 +87,11 @@ public class PlayerController : Entity, IDamageable
     float _currentHealTime;
 
     MMF_Sound _moveSound;
+    MMF_Sound _healChargeSound;
+    MMF_Sound _healCastSound;
+    MMF_Particles _moveParticles;
+    MMF_Particles _healChargeParticles;
+    MMF_Particles _healCastParticles;
 
     private new void Start() {
         base.Start();
@@ -111,6 +116,27 @@ public class PlayerController : Entity, IDamageable
         GameUIManager.Instance.UpdateMana(_currentMana/TotalMana);
 
         _moveSound = MovePlayer.GetFeedbackOfType<MMF_Sound>();
+        _moveParticles = MovePlayer.GetFeedbackOfType<MMF_Particles>();
+
+        List<MMF_Particles> healParticles = HealPlayer.GetFeedbacksOfType<MMF_Particles>();
+
+        for (int i = 0; i < healParticles.Count; i++) {
+            if (healParticles[i].Label == "Heal") {
+                _healCastParticles = healParticles[i];
+            } else {
+                _healChargeParticles = healParticles[i];
+            }
+        }
+
+        List<MMF_Sound> healSounds = HealPlayer.GetFeedbacksOfType<MMF_Sound>();
+
+        for (int i = 0; i < healSounds.Count; i++) {
+            if (healSounds[i].Label== "HealCastSound") {
+                _healCastSound = healSounds[i];
+            } else {
+                _healChargeSound = healSounds[i];
+            }
+        }
     }
 
     private void Update()
@@ -220,7 +246,9 @@ public class PlayerController : Entity, IDamageable
     void Move()
     {
         if (_isJump)
-        {            
+        {   
+            _moveParticles.Stop(transform.position);
+            _moveParticles.Active = false;
             transform.position += new Vector3(_dir, 0, 0) * JumpMove * Time.deltaTime;            
             _anim.SetBool("Run", false);
                 _anim.SetBool("Walk", false);
@@ -231,6 +259,9 @@ public class PlayerController : Entity, IDamageable
             if (!MovePlayer.IsPlaying) {
                 MovePlayer.PlayFeedbacks();
                 _moveSound.Play(transform.position);
+            } else if (!_moveParticles.Active && !_isJump) {
+                _moveParticles.Active = true;
+                 _moveParticles.Play(transform.position); 
             }
             transform.position = transform.position + new Vector3(_dir * SpeedMove, 0, 0) * Time.deltaTime;
             _anim.SetBool("Run", true);
@@ -309,10 +340,16 @@ public class PlayerController : Entity, IDamageable
             Die();
         }
 
+        HitPlayer.PlayFeedbacks();
         _anim.SetTrigger("Hit");
         _anim.SetBool("Healing", false);
     }
     public void Heal(int heal) {
+        HealPlayer.PlayFeedbacks();
+        _healChargeParticles.Mode = MMF_Particles.Modes.Play;
+        _healChargeParticles.Play(transform.position);
+        _healChargeSound.Active = true;
+        _healChargeSound.Play(transform.position);
         _isHealing = true;
         _anim.ResetTrigger("HealEnd");
         _anim.SetBool("Healing", true);
@@ -359,18 +396,35 @@ public class PlayerController : Entity, IDamageable
             yield return null;
         }
 
+        _healChargeParticles.Stop(transform.position);
+        _healChargeParticles.Mode = MMF_Particles.Modes.Stop;
+        _healChargeSound.Stop(transform.position);
+        _healChargeSound.Active = false;
+
         if ((_isHealing == false || !Input.GetKey(KeyCode.T)) && _currentHealTime > 0) {
             // Heal Canceled
+            HealPlayer.StopFeedbacks();
             _currentHealTime = HealTime;
             _anim.SetBool("Healing", false);
             yield break;
         }
+        _anim.SetTrigger("HealEnd");
+        _healCastParticles.Mode = MMF_Particles.Modes.Play;
+        _healCastParticles.Play(transform.position);
+        _healCastSound.Active = true;
+        _healCastSound.Play(transform.position);
+        
+        yield return new WaitForSeconds(0.3f);
+        _healCastParticles.Stop(transform.position);
+        _healCastParticles.Mode = MMF_Particles.Modes.Stop;
+        _healCastSound.Stop(transform.position);
+        _healCastSound.Active = false;
+        HealPlayer.StopFeedbacks();
 
         _currentHealth += healAmount;
         if (_currentHealth > TotalHealth) {
             _currentHealth = TotalHealth;
         }
-        _anim.SetTrigger("HealEnd");
         yield return null;
         _anim.SetBool("Healing", false);
         _isHealing = false;
