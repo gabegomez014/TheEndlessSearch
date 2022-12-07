@@ -180,8 +180,9 @@ public class PlayerController : Entity, IDamageable
         }
 
         if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D)) {
-            MovePlayer.StopFeedbacks();
             _moveSound.Stop(transform.position);
+            _moveSound.Active = false;
+            MovePlayer.StopFeedbacks();
         }
     }
 
@@ -249,6 +250,9 @@ public class PlayerController : Entity, IDamageable
         {   
             _moveParticles.Stop(transform.position);
             _moveParticles.Active = false;
+            _moveSound.Stop(transform.position);
+            _moveSound.Active = false;
+
             transform.position += new Vector3(_dir, 0, 0) * JumpMove * Time.deltaTime;            
             _anim.SetBool("Run", false);
                 _anim.SetBool("Walk", false);
@@ -258,10 +262,18 @@ public class PlayerController : Entity, IDamageable
         {   
             if (!MovePlayer.IsPlaying) {
                 MovePlayer.PlayFeedbacks();
+                _moveSound.Active = true;
                 _moveSound.Play(transform.position);
-            } else if (!_moveParticles.Active && !_isJump) {
+            } 
+            
+            if (!_moveParticles.Active && !_isJump) {
                 _moveParticles.Active = true;
                  _moveParticles.Play(transform.position); 
+            } 
+            
+            if (!_moveSound.Active && !_isJump) {
+                _moveSound.Active = true;
+                _moveSound.Play(transform.position);
             }
             transform.position = transform.position + new Vector3(_dir * SpeedMove, 0, 0) * Time.deltaTime;
             _anim.SetBool("Run", true);
