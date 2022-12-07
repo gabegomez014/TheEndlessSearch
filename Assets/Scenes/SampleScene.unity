@@ -1678,8 +1678,8 @@ MonoBehaviour:
         PoolSize: 10
         MinVolume: 1
         MaxVolume: 1
-        MinPitch: 1
-        MaxPitch: 1
+        MinPitch: 1.4
+        MaxPitch: 1.7
         SfxAudioMixerGroup: {fileID: 0}
         Priority: 128
     - rid: 6342093178196459529
