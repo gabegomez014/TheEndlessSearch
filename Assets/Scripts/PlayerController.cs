@@ -388,6 +388,7 @@ public class PlayerController : Entity, IDamageable
         _currentDodgeTime = DodgeTime;
         float speed = CalculateDodgeSpeed();
 
+        DodgePlayer.PlayFeedbacks();
         while(_currentDodgeTime > 0) {
             Vector3 newPos = transform.position;
             newPos.x += _dir * speed * Time.deltaTime;
@@ -396,6 +397,7 @@ public class PlayerController : Entity, IDamageable
             _currentDodgeTime -= Time.deltaTime;
             yield return null;
         }
+        DodgePlayer.StopFeedbacks();
 
         _isDodging = false;
     }
