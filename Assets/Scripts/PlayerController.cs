@@ -35,6 +35,8 @@ public class PlayerController : Entity, IDamageable
 
     [Header("Feedback to play on Jump")]
     public MMF_Player JumpPlayer;
+    [Header("Feedback to play on Jump Land")]
+    public MMF_Player JumpLandPlayer;
 
     [Header("How far dodge takes player forward")]
     public float DodgeDistance;
@@ -92,6 +94,7 @@ public class PlayerController : Entity, IDamageable
     MMF_Particles _moveParticles;
     MMF_Particles _healChargeParticles;
     MMF_Particles _healCastParticles;
+    MMF_Particles _jumpLandParticles;
 
     private new void Start() {
         base.Start();
@@ -117,6 +120,7 @@ public class PlayerController : Entity, IDamageable
 
         _moveSound = MovePlayer.GetFeedbackOfType<MMF_Sound>();
         _moveParticles = MovePlayer.GetFeedbackOfType<MMF_Particles>();
+        _jumpLandParticles = MovePlayer.GetFeedbackOfType<MMF_Particles>();
 
         List<MMF_Particles> healParticles = HealPlayer.GetFeedbacksOfType<MMF_Particles>();
 
@@ -314,10 +318,11 @@ public class PlayerController : Entity, IDamageable
             _isFalling = true;
             Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
             if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+                JumpPlayer.StopFeedbacks();
+                StartCoroutine(JumpLand());
                 _isJump = false;
                 _jumpKeyHeld = false;
                 _isFalling = false;
-                JumpPlayer.StopFeedbacks();
                 _anim.SetBool("IsGrounded", true);
                 _anim.SetBool("IsFalling", false);
                 CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
@@ -328,9 +333,10 @@ public class PlayerController : Entity, IDamageable
     private void Falling() {
         Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
         if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+            JumpPlayer.StopFeedbacks();
+            StartCoroutine(JumpLand());
             _isJump = false;
             _isFalling = false;
-            JumpPlayer.StopFeedbacks();
             _anim.SetBool("IsGrounded", true);
             _anim.SetBool("IsFalling", false);
             CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
@@ -385,6 +391,12 @@ public class PlayerController : Entity, IDamageable
     }
     public override void AttackRecovery() {
         throw new System.Exception("Attack recovery not implemented");
+    }
+
+    IEnumerator JumpLand() {
+        JumpLandPlayer.PlayFeedbacks();
+        yield return new WaitForSeconds(0.5f);
+        JumpLandPlayer.StopFeedbacks();
     }
 
     IEnumerator Dodging() {
