@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d991bd1921c6b4f0296a259827502ca4, type: 3}
+  m_Name: Heal
+  m_EditorClassIdentifier: 
+  AbilityName: Heal
+  AbilityBaseCoolDown: 1
+  AbilityActivationTime: 0.5
+  KeyToActivate: 113
+  MaxAbilityDuration: 1.5
+  FeedbacksPlayerName: HealPlayer
+  AnticipationFeedbackLabel: HealCharge
+  AnticipationDuration: 0.5
+  CastFeedbackLabel: HealCast
+  CastDuration: 0
+  DeathDuration: 0.2
+  AbilitySprite: {fileID: 0}
+  StatToEffect: 0
+  IncreaseAmount: 5
