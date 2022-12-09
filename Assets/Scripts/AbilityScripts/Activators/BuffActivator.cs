@@ -53,7 +53,7 @@ public class BuffActivator : Activator
         _anticipationSound.Stop(transform.position);
         _anticipationSound.Active = false;
 
-         if ((Player.GetBuffing() == false || !Input.GetKey(KeyCode.T)) && currentTime < 0) {
+         if ((Player.GetBuffing() == false || !Input.GetKey(KeyCode.T)) && currentTime < _anticipationDuration) {
             // Buff Canceled
             _feedbackPlayer.StopFeedbacks();
             Anim.SetBool(_anticipationAnimationParameterName, false);

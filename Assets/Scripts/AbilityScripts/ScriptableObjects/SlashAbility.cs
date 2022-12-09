@@ -1,20 +1,17 @@
-
-
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu (menuName = "Abilities/BuffAbility")]
-public class BuffAbility : Ability {
+[CreateAssetMenu (menuName = "Abilities/SlashAbility")]
+public class SlashAbility : Ability
+{
+    [Header("Slash Ability mechanics")]
+    [Tooltip("How far this slash affects")]
+    public float SlashDistance;
 
-    [Header("Buff Ability Information")]
-    public Stats StatToEffect;
-    public int IncreaseAmount = 10;
-
-    private BuffActivator _activator;
-    public override void Initialize(GameObject obj)
-    {
-        _activator = obj.GetComponent<BuffActivator>();
+    private SlashActivator _activator;
+    public override void Initialize(GameObject obj) {
+        _activator = obj.GetComponent<SlashActivator>();
 
         // Base activator set
         _activator.SetAbilityCooldown(AbilityBaseCoolDown);
@@ -29,14 +26,10 @@ public class BuffAbility : Ability {
         _activator.SetCastFeedbackLabel(CastFeedbackLabel);
         _activator.SetFeedbackPlayer(FeedbacksPlayerName);
 
-        // Buff activator specific sets
-        _activator.SetIncreaseAmount(IncreaseAmount);
-        _activator.SetStatToEffect(StatToEffect);
+        // Slash activator specific sets
+        _activator.SetSlashDistance(SlashDistance);
     }
-
-    public override void TriggerAbility()
-    {
+    public override void TriggerAbility() {
         _activator.Activate();
     }
-
 }
