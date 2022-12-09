@@ -15,48 +15,43 @@ public class PlayerController : Entity, IDamageable
     [Header("Main Virtual Camera")]
     public CinemachineVirtualCamera VCam;
 
-    [Header("Rotation speed")]
+    [Header("Movement mechanics")]
+    [Tooltip("Rotation speed")]
     public float SpeedRot;
 
-    [Header("Movement speed")]
+    [Tooltip("Movement speed")]
     public float SpeedMove;
 
-    [Header("Feedback to play on Move")]
+    [Tooltip("Feedback to play on Move")]
     public MMF_Player MovePlayer;
 
-    [Header("Max Jump height")]
+    [Header("Jump Mechanics")]
+    [Tooltip("Max Jump height")]
     public float MaxJumpHeight;
 
-    [Header("Movement speed during jump")]
+    [Tooltip("Movement speed during jump")]
     public float JumpMove;
 
-    [Header("Drag on Player Jump")]
+    [Tooltip("Drag on Player Jump")]
     public float CounterJumpForce;
 
-    [Header("Feedback to play on Jump")]
+    [Tooltip("Feedback to play on Jump")]
     public MMF_Player JumpPlayer;
-    [Header("Feedback to play on Jump Land")]
+    [Tooltip("Feedback to play on Jump Land")]
     public MMF_Player JumpLandPlayer;
 
-    [Header("How far dodge takes player forward")]
+    [Header("Dodge Mechanics")]
+    [Tooltip("How far the dodge takes the player")]
     public float DodgeDistance;
 
-    [Header("How long dodge state is active")]
+    [Tooltip("How long the dodge lasts")]
     public float DodgeTime;
-
-    [Header("Feedback to play on dodge")]
+    [Tooltip("The feedback to play when the player dodges")]
     public MMF_Player DodgePlayer;
 
-    [Header("Time for player to cast heal")]
-    public float HealTime;
-
-    [Header("Feedback to play on Heal")]
-    public MMF_Player HealPlayer;
-
-    [Header("Camera Aim Offset")]
+    [Header("Camera Settings")]
     public float CameraAimOffset;
 
-    [Header("Camera look at position offset")]
     public float CameraLookAtOffset;
 
     [Header("Time available for Attack combo")]
@@ -65,7 +60,10 @@ public class PlayerController : Entity, IDamageable
     [Header("Feedback to play on being hit")]
     public MMF_Player HitPlayer;
 
-    public bool _isJump;
+    [Header("Player abilities")]
+    public Ability HealAbility;
+
+    private bool _isJump;
 
     private bool _jumpKeyHeld;
 
@@ -73,7 +71,7 @@ public class PlayerController : Entity, IDamageable
 
     private bool _isDodging;
 
-    private bool _isHealing;
+    private bool _isBuffing;
 
     private Animator _anim;
 
@@ -83,17 +81,14 @@ public class PlayerController : Entity, IDamageable
     
     private Rigidbody _rb;
 
+    private BuffActivator _buffActivator;
+
     float _raycastDistance = 1;
     RaycastHit _hit;
     float _currentDodgeTime;
-    float _currentHealTime;
 
     MMF_Sound _moveSound;
-    MMF_Sound _healChargeSound;
-    MMF_Sound _healCastSound;
     MMF_Particles _moveParticles;
-    MMF_Particles _healChargeParticles;
-    MMF_Particles _healCastParticles;
     MMF_Particles _jumpLandParticles;
 
     private new void Start() {
@@ -122,25 +117,7 @@ public class PlayerController : Entity, IDamageable
         _moveParticles = MovePlayer.GetFeedbackOfType<MMF_Particles>();
         _jumpLandParticles = MovePlayer.GetFeedbackOfType<MMF_Particles>();
 
-        List<MMF_Particles> healParticles = HealPlayer.GetFeedbacksOfType<MMF_Particles>();
-
-        for (int i = 0; i < healParticles.Count; i++) {
-            if (healParticles[i].Label == "Heal") {
-                _healCastParticles = healParticles[i];
-            } else {
-                _healChargeParticles = healParticles[i];
-            }
-        }
-
-        List<MMF_Sound> healSounds = HealPlayer.GetFeedbacksOfType<MMF_Sound>();
-
-        for (int i = 0; i < healSounds.Count; i++) {
-            if (healSounds[i].Label== "HealCastSound") {
-                _healCastSound = healSounds[i];
-            } else {
-                _healChargeSound = healSounds[i];
-            }
-        }
+        HealAbility.Initialize(this.gameObject);
     }
 
     private void Update()
@@ -180,8 +157,9 @@ public class PlayerController : Entity, IDamageable
             TakeDamage(8);
         }
 
-        if (Input.GetKeyDown(KeyCode.T)) {
-            Heal(5);
+        if (Input.GetKeyDown(HealAbility.KeyToActivate)) {
+            _isBuffing = true;
+            HealAbility.TriggerAbility();
         }
 
         if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D)) {
@@ -198,7 +176,7 @@ public class PlayerController : Entity, IDamageable
     {
         if (Input.GetKey(KeyCode.D))
         {           
-            _isHealing = false;
+            _isBuffing = false;
             _dir = 1;
             Move();            
             rot = Quaternion.LookRotation(Vector3.right);
@@ -220,7 +198,7 @@ public class PlayerController : Entity, IDamageable
         
         else if (Input.GetKey(KeyCode.A))
         {
-            _isHealing = false;
+            _isBuffing = false;
             _dir = -1;            
             Move();
             rot = Quaternion.LookRotation(Vector3.left);
@@ -290,7 +268,7 @@ public class PlayerController : Entity, IDamageable
     {
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            _isHealing = false;
+            _isBuffing = false;
             StartCoroutine(Dodging());
             _anim.SetTrigger("Dodge");
             _anim.SetBool("Healing", false);
@@ -299,7 +277,7 @@ public class PlayerController : Entity, IDamageable
 
     void Jump() {
         if (Input.GetKeyDown(KeyCode.Space)) {
-            _isHealing = false;
+            _isBuffing = false;
             _jumpKeyHeld = true;
             _isJump = true;
             JumpPlayer.PlayFeedbacks();
@@ -354,7 +332,7 @@ public class PlayerController : Entity, IDamageable
     }
 
     public void TakeDamage(int damage) {
-        _isHealing = false;
+        _isBuffing = false;
         _currentHealth -= damage;
         GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
         if (_currentHealth <= 0) {
@@ -367,20 +345,25 @@ public class PlayerController : Entity, IDamageable
         _anim.SetBool("Healing", false);
     }
     public void Heal(int heal) {
-        HealPlayer.PlayFeedbacks();
-        _healChargeParticles.Mode = MMF_Particles.Modes.Play;
-        _healChargeParticles.Play(transform.position);
-        _healChargeSound.Active = true;
-        _healChargeSound.Play(transform.position);
-        _isHealing = true;
-        _anim.ResetTrigger("HealEnd");
-        _anim.SetBool("Healing", true);
-        StartCoroutine(Healing(heal));
+        _currentHealth += heal;
+        if (_currentHealth > TotalHealth) {
+            _currentHealth = TotalHealth;
+        }
+
+        GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
     }
 
     public void Die()
     {
         Destroy(this.gameObject);
+    }
+
+    public bool GetBuffing() {
+        return _isBuffing;
+    }
+
+    public void SetBuffing(bool state) {
+        _isBuffing = state;
     }
 
     public override void AttackAnticipation() {
@@ -418,46 +401,4 @@ public class PlayerController : Entity, IDamageable
         _isDodging = false;
     }
 
-    IEnumerator Healing(int healAmount) {
-        _currentHealTime = HealTime;
-
-        while (_isHealing && Input.GetKey(KeyCode.T) && _currentHealTime > 0) {
-            _currentHealTime -= Time.deltaTime;
-            yield return null;
-        }
-
-        _healChargeParticles.Stop(transform.position);
-        _healChargeParticles.Mode = MMF_Particles.Modes.Stop;
-        _healChargeSound.Stop(transform.position);
-        _healChargeSound.Active = false;
-
-        if ((_isHealing == false || !Input.GetKey(KeyCode.T)) && _currentHealTime > 0) {
-            // Heal Canceled
-            HealPlayer.StopFeedbacks();
-            _currentHealTime = HealTime;
-            _anim.SetBool("Healing", false);
-            yield break;
-        }
-        _anim.SetTrigger("HealEnd");
-        _healCastParticles.Mode = MMF_Particles.Modes.Play;
-        _healCastParticles.Play(transform.position);
-        _healCastSound.Active = true;
-        _healCastSound.Play(transform.position);
-        
-        yield return new WaitForSeconds(0.3f);
-        _healCastParticles.Stop(transform.position);
-        _healCastParticles.Mode = MMF_Particles.Modes.Stop;
-        _healCastSound.Stop(transform.position);
-        _healCastSound.Active = false;
-        HealPlayer.StopFeedbacks();
-
-        _currentHealth += healAmount;
-        if (_currentHealth > TotalHealth) {
-            _currentHealth = TotalHealth;
-        }
-        yield return null;
-        _anim.SetBool("Healing", false);
-        _isHealing = false;
-        GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
-    }
 }

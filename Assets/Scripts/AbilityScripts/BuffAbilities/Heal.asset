@@ -19,8 +19,10 @@ MonoBehaviour:
   MaxAbilityDuration: 1.5
   FeedbacksPlayerName: HealPlayer
   AnticipationFeedbackLabel: HealCharge
+  AnticipationAnimationParameterName: Healing
   AnticipationDuration: 0.5
   CastFeedbackLabel: HealCast
+  CastAnimationParameterName: HealEnd
   CastDuration: 0
   DeathDuration: 0.2
   AbilitySprite: {fileID: 0}

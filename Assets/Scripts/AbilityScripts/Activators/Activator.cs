@@ -6,27 +6,30 @@ using MoreMountains.Feedbacks;
 public abstract class Activator : MonoBehaviour
 {
     public Animator Anim;
+    public PlayerController Player;
     
-    private float _abilityCoolDown;
-    private float _abilityActivationTime;
-    private float _maxAbilityDuration;
-    private MMF_Player _feedbackPlayer;
+    protected float _abilityCoolDown;
+    protected float _abilityActivationTime;
+    protected float _maxAbilityDuration;
+    protected MMF_Player _feedbackPlayer;
 
-    private KeyCode _keyToActivate;
+    protected KeyCode _keyToActivate;
 
-    private string _anticipationFeedbackLabel;
-    private MMF_Sound _anticipationSound;
-    private MMF_Particles _anticipationParticles;
-    private float _anticipationDuration;
+    protected string _anticipationFeedbackLabel;
+    protected string _anticipationAnimationParameterName;
+    protected MMF_Sound _anticipationSound;
+    protected MMF_Particles _anticipationParticles;
+    protected float _anticipationDuration;
 
-    private string _castFeedbackLabel;
-    private MMF_Sound _castSound;
-    private MMF_Particles _castParticles;
-    private float _castDuration;
+    protected string _castFeedbackLabel;
+    protected string _castAnimationParameterName;
+    protected MMF_Sound _castSound;
+    protected MMF_Particles _castParticles;
+    protected float _castDuration;
 
-    private float _deathDuration;
+    protected float _deathDuration;
 
-    public void SetPlayer(string name) {
+    public void SetFeedbackPlayer(string name) {
         _feedbackPlayer = transform.Find(name).GetComponent<MMF_Player>();
 
         List<MMF_Sound> sounds = _feedbackPlayer.GetFeedbacksOfType<MMF_Sound>();
@@ -41,7 +44,7 @@ public abstract class Activator : MonoBehaviour
         }
 
         for (int i = 0; i < particles.Count; i++) {
-            if (sounds[i].Label == _anticipationFeedbackLabel + "Particles") {
+            if (particles[i].Label == _anticipationFeedbackLabel + "Particles") {
                 _anticipationParticles = particles[i];
             } else {
                 _castParticles = particles[i];
@@ -49,11 +52,31 @@ public abstract class Activator : MonoBehaviour
         }
     }
 
+    public void SetAnticipationParameterName(string name) {
+        _anticipationAnimationParameterName = name;
+    }
+
+    public void SetCastParameterName(string name) {
+        _castAnimationParameterName = name;
+    }
+
+    public void SetAnticipationFeedbackLabel(string name) {
+        _anticipationFeedbackLabel = name;
+    }
+
+    public void SetCastFeedbackLabel(string name) {
+        _castFeedbackLabel = name;
+    }
+
     public void SetAbilityCooldown(float duration) {
         _abilityCoolDown = duration;
     }
     public void SetMaxAbilityDuration(float duration) {
         _maxAbilityDuration = duration;
+    }
+
+    public void SetKeyToActivate(KeyCode key) {
+        _keyToActivate = key;
     }
 
     public void SetAnticipationDuration(float duration) {

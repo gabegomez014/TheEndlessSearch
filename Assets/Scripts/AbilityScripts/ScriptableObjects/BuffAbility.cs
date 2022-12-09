@@ -19,9 +19,15 @@ public class BuffAbility : Ability {
         // Base Activator set
         activator.SetAbilityCooldown(AbilityBaseCoolDown);
         activator.SetMaxAbilityDuration(MaxAbilityDuration);
+        activator.SetKeyToActivate(KeyToActivate);
         activator.SetAnticipationDuration(AnticipationDuration);
         activator.SetCastDuration(CastDuration);
         activator.SetDeathDuration(DeathDuration);
+        activator.SetAnticipationParameterName(AnticipationAnimationParameterName);
+        activator.SetCastParameterName(CastAnimationParameterName);
+        activator.SetAnticipationFeedbackLabel(AnticipationFeedbackLabel);
+        activator.SetCastFeedbackLabel(CastFeedbackLabel);
+        activator.SetFeedbackPlayer(FeedbacksPlayerName);
 
         // Buff Activator specific sets
         activator.SetIncreaseAmount(IncreaseAmount);

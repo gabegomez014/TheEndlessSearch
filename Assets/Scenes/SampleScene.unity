@@ -466,13 +466,11 @@ MonoBehaviour:
   DodgeDistance: 5
   DodgeTime: 0.2
   DodgePlayer: {fileID: 1187024907}
-  HealTime: 0.5
-  HealPlayer: {fileID: 1058048744}
   CameraAimOffset: 0
   CameraLookAtOffset: 2.5
   term: 1
   HitPlayer: {fileID: 1071789299}
-  _isJump: 0
+  HealAbility: {fileID: 11400000, guid: f9f9c97bf65fb406fb8daf6f91189815, type: 2}
 --- !u!54 &180645159
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -516,6 +514,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Anim: {fileID: 1829006668}
+  Player: {fileID: 180645158}
 --- !u!1 &181841855
 GameObject:
   m_ObjectHideFlags: 0
@@ -1722,7 +1721,6 @@ MonoBehaviour:
   - rid: 6342093178196459523
   - rid: 6342093178196459528
   - rid: 6342093178196459529
-  - rid: 6342093178196459540
   KeepPlayModeChanges: 0
   PerformanceMode: 0
   ForceStopFeedbacksOnDisable: 1
@@ -1874,7 +1872,7 @@ MonoBehaviour:
     - rid: 6342093178196459528
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks.MMTools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -1490704994
         Label: HealChargeSound
         ChannelMode: 0
@@ -1953,7 +1951,7 @@ MonoBehaviour:
     - rid: 6342093178196459529
       type: {class: MMF_Sound, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks.MMTools}
       data:
-        Active: 1
+        Active: 0
         UniqueID: -189566420
         Label: HealCastSound
         ChannelMode: 0
@@ -2029,97 +2027,6 @@ MonoBehaviour:
         MaxPitch: 1
         SfxAudioMixerGroup: {fileID: 0}
         Priority: 128
-    - rid: 6342093178196459540
-      type: {class: MMF_Animation, ns: MoreMountains.Feedbacks, asm: MoreMountains.Feedbacks}
-      data:
-        Active: 1
-        UniqueID: 453772342
-        Label: Animation Parameter
-        ChannelMode: 0
-        Channel: 0
-        MMChannelDefinition: {fileID: 0}
-        Chance: 100
-        DisplayColor: {r: 0, g: 0, b: 0, a: 1}
-        Timing:
-          TimescaleMode: 0
-          ExcludeFromHoldingPauses: 0
-          ContributeToTotalDuration: 1
-          InitialDelay: 0
-          CooldownDuration: 0
-          InterruptsOnStop: 1
-          NumberOfRepeats: 0
-          RepeatForever: 0
-          DelayBetweenRepeats: 1
-          MMFeedbacksDirectionCondition: 0
-          PlayDirection: 0
-          ConstantIntensity: 0
-          UseIntensityInterval: 0
-          IntensityIntervalMin: 0
-          IntensityIntervalMax: 0
-          Sequence: {fileID: 0}
-          TrackID: 0
-          Quantized: 0
-          TargetBPM: 120
-        RandomizeOutput: 0
-        RandomMultiplier: {x: 0.8, y: 1}
-        RandomizeDuration: 0
-        RandomDurationMultiplier: {x: 0.5, y: 2}
-        UseRange: 0
-        RangeDistance: 5
-        UseRangeFalloff: 0
-        RangeFalloff:
-          serializedVersion: 2
-          m_Curve:
-          - serializedVersion: 3
-            time: 0
-            value: 1
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          - serializedVersion: 3
-            time: 1
-            value: 0
-            inSlope: 0
-            outSlope: 0
-            tangentMode: 0
-            weightedMode: 0
-            inWeight: 0
-            outWeight: 0
-          m_PreInfinity: 2
-          m_PostInfinity: 2
-          m_RotationOrder: 4
-        RemapRangeFalloff: {x: 0, y: 1}
-        Owner: {fileID: 1058048744}
-        DebugActive: 0
-        BoundAnimator: {fileID: 1829006668}
-        DeclaredDuration: 0
-        UpdateTrigger: 0
-        TriggerMode: 0
-        TriggerParameterName: 
-        UpdateRandomTrigger: 0
-        RandomTriggerMode: 0
-        RandomTriggerParameterNames: []
-        UpdateBool: 1
-        BoolParameterName: Healing
-        BoolParameterValue: 1
-        UpdateRandomBool: 0
-        RandomBoolParameterValue: 1
-        RandomBoolParameterNames: []
-        IntValueMode: 0
-        IntParameterName: 
-        IntValue: 0
-        IntValueMin: 0
-        IntValueMax: 5
-        IntIncrement: 1
-        FloatValueMode: 0
-        FloatParameterName: 
-        FloatValue: 0
-        FloatValueMin: 0
-        FloatValueMax: 5
-        FloatIncrement: 1
 --- !u!1 &1071789298
 GameObject:
   m_ObjectHideFlags: 0

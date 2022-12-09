@@ -13,10 +13,12 @@ public abstract class Ability : ScriptableObject
     public string FeedbacksPlayerName;
     [Header("Ability Anticipation information")]
     public string AnticipationFeedbackLabel;
+    public string AnticipationAnimationParameterName;
     public float AnticipationDuration;
 
     [Header("Ability Casting information")]
     public string CastFeedbackLabel;
+    public string CastAnimationParameterName;
     public float CastDuration;
 
     [Header("Ability Death information")]
