@@ -7,6 +7,8 @@ public abstract class Activator : MonoBehaviour
 {
     public Animator Anim;
     public PlayerController Player;
+
+    protected bool _activated;
     
     protected float _abilityCoolDown;
     protected float _abilityActivationTime;
@@ -93,6 +95,10 @@ public abstract class Activator : MonoBehaviour
 
     public void SetDeathDuration(float duration) {
         _deathDuration = duration;
+    }
+
+    public bool GetActivated() {
+        return _activated;
     }
     
     public abstract void Activate();

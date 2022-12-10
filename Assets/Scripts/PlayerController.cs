@@ -111,6 +111,7 @@ public class PlayerController : Entity, IDamageable
 
         _rb = GetComponent<Rigidbody>();
         _slashActivator = GetComponent<SlashActivator>();
+        _buffActivator = GetComponent<BuffActivator>();
 
         _jumpKeyHeld = false;
         _isJump = false;
@@ -166,12 +167,12 @@ public class PlayerController : Entity, IDamageable
             TakeDamage(8);
         }
 
-        if (Input.GetKeyDown(HealAbility.KeyToActivate)) {
+        if (Input.GetKeyDown(HealAbility.KeyToActivate) && !_buffActivator.GetActivated()) {
             _isBuffing = true;
             HealAbility.TriggerAbility();
         }
 
-        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D)) {
+        if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D) || _isAttacking) {
             _moveSound.Stop(transform.position);
             _moveSound.Active = false;
             MovePlayer.StopFeedbacks();
@@ -443,7 +444,7 @@ public class PlayerController : Entity, IDamageable
 
             yield return null;
         }
-        yield return null;
+        yield return new WaitForSeconds(AttackAbilities[AttackAbilities.Length-1].DeathDuration);
         _isAttacking = false;
 
     }

@@ -6,7 +6,6 @@ public class SlashActivator : Activator
 {
     private float _slashDistance;
     private int _damage;
-    private bool _activated;
 
 
     private void Start() {
@@ -18,10 +17,6 @@ public class SlashActivator : Activator
     }
     public void SetDamage(int damage) {
         _damage = damage;
-    }
-
-    public bool GetActivated() {
-        return _activated;
     }
 
     public override void Activate()
@@ -45,7 +40,7 @@ public class SlashActivator : Activator
     public override IEnumerator CastAction()
     {
         RaycastHit hit;
-        
+
         _castSound.Play(transform.position);
         _castParticles.Play(transform.position);
         Anim.SetTrigger(_castAnimationParameterName);
@@ -57,7 +52,9 @@ public class SlashActivator : Activator
         }
 
         yield return new WaitForSeconds(_deathDuration);
+        _feedbackPlayer.StopFeedbacks();
 
+        yield return new WaitForSeconds(_abilityCoolDown);
         _activated = false;
     }
 }

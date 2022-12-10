@@ -22,10 +22,13 @@ public class BuffActivator : Activator
 
     public override void Activate()
     {
-        if (_anticipationDuration > 0) {
+        if (!_activated) {
+            _activated = true;
+            if (_anticipationDuration > 0) {
             StartCoroutine(AnticipationAction());
-        } else {
-            StartCoroutine(CastAction());
+            } else {
+                StartCoroutine(CastAction());
+            }
         }
     }
 
@@ -57,6 +60,7 @@ public class BuffActivator : Activator
             // Buff Canceled
             _feedbackPlayer.StopFeedbacks();
             Anim.SetBool(_anticipationAnimationParameterName, false);
+            _activated = false;
             yield break;
         }
 
@@ -94,5 +98,9 @@ public class BuffActivator : Activator
                 Player.Heal(_increaseAmount);
                 break;
         }
+
+        yield return new WaitForSeconds(_abilityCoolDown);
+
+        _activated = false;
     }
 }
