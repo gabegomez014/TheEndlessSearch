@@ -8,6 +8,7 @@ public class SlashAbility : Ability
     [Header("Slash Ability mechanics")]
     [Tooltip("How far this slash affects")]
     public float SlashDistance;
+    public int Damage;
 
     private SlashActivator _activator;
     public override void Initialize(GameObject obj) {
@@ -28,6 +29,7 @@ public class SlashAbility : Ability
 
         // Slash activator specific sets
         _activator.SetSlashDistance(SlashDistance);
+        _activator.SetDamage(Damage);
     }
     public override void TriggerAbility() {
         _activator.Activate();

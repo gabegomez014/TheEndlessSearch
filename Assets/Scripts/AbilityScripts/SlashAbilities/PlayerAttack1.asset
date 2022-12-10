@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89bf19cb603874b58be0d2c6faffa3d0, type: 3}
+  m_Name: PlayerAttack1
+  m_EditorClassIdentifier: 
+  AbilityName: PlayerAttack1
+  AbilityBaseCoolDown: 0
+  AbilityActivationTime: 0
+  KeyToActivate: 323
+  MaxAbilityDuration: 1
+  FeedbacksPlayerName: Attack1
+  AnticipationFeedbackLabel: 
+  AnticipationAnimationParameterName: 
+  AnticipationDuration: 0
+  CastFeedbackLabel: Attack1
+  CastAnimationParameterName: Attack1
+  CastDuration: 0
+  DeathDuration: 0.15
+  AbilitySprite: {fileID: 0}
+  SlashDistance: 2
+  Damage: 2

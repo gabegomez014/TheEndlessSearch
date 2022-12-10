@@ -14,8 +14,4 @@ public abstract class Entity : MonoBehaviour
         _currentHealth = TotalHealth;
         _currentMana = TotalMana;
     }
-
-    public abstract void AttackAnticipation();
-    public abstract void Attack();
-    public abstract void AttackRecovery();
 }

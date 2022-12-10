@@ -55,12 +55,13 @@ public class PlayerController : Entity, IDamageable
     public float CameraLookAtOffset;
 
     [Header("Time available for Attack combo")]
-    public int term;
+    public float Term;
 
     [Header("Feedback to play on being hit")]
     public MMF_Player HitPlayer;
 
     [Header("Player abilities")]
+    public SlashAbility[] AttackAbilities;
     public Ability HealAbility;
 
     private bool _isJump;
@@ -73,6 +74,8 @@ public class PlayerController : Entity, IDamageable
 
     private bool _isBuffing;
 
+    private bool _isAttacking;
+
     private Animator _anim;
 
     private float _dir = 1;
@@ -82,6 +85,7 @@ public class PlayerController : Entity, IDamageable
     private Rigidbody _rb;
 
     private BuffActivator _buffActivator;
+    private SlashActivator _slashActivator;
 
     float _raycastDistance = 1;
     RaycastHit _hit;
@@ -106,6 +110,7 @@ public class PlayerController : Entity, IDamageable
         }
 
         _rb = GetComponent<Rigidbody>();
+        _slashActivator = GetComponent<SlashActivator>();
 
         _jumpKeyHeld = false;
         _isJump = false;
@@ -118,11 +123,14 @@ public class PlayerController : Entity, IDamageable
         _jumpLandParticles = MovePlayer.GetFeedbackOfType<MMF_Particles>();
 
         HealAbility.Initialize(this.gameObject);
+        _isAttacking = false;
     }
 
     private void Update()
     {
-        Rotate();
+        if (!_isAttacking) {
+            Rotate();
+        }
         transform.position = new Vector3(transform.position.x, transform.position.y, 0f);
 
         if (!_isJump && !_isFalling && !_isDodging)
@@ -135,7 +143,7 @@ public class PlayerController : Entity, IDamageable
                 return;
             }
                         
-            // Attack();
+            Attack();
             
             Dodge();
             
@@ -148,6 +156,7 @@ public class PlayerController : Entity, IDamageable
         }
 
         else if (_isJump && !_jumpKeyHeld && !_isDodging) {
+            Dodge();
             Falling();
         } else if (_isFalling && !_isDodging) {
             Falling();
@@ -309,17 +318,19 @@ public class PlayerController : Entity, IDamageable
     }
 
     private void Falling() {
-        Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
-        if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
-            JumpPlayer.StopFeedbacks();
-            StartCoroutine(JumpLand());
-            _isJump = false;
-            _isFalling = false;
-            _anim.SetBool("IsGrounded", true);
-            _anim.SetBool("IsFalling", false);
-            CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
-        } else {
-            _rb.AddForce(new Vector3(0, CounterJumpForce) * _rb.mass);
+        if (!_isDodging) {
+            Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
+            if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+                JumpPlayer.StopFeedbacks();
+                StartCoroutine(JumpLand());
+                _isJump = false;
+                _isFalling = false;
+                _anim.SetBool("IsGrounded", true);
+                _anim.SetBool("IsFalling", false);
+                CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
+            } else {
+                _rb.AddForce(new Vector3(0, CounterJumpForce) * _rb.mass);
+            }
         }
     }
 
@@ -362,18 +373,18 @@ public class PlayerController : Entity, IDamageable
         return _isBuffing;
     }
 
+    public float GetDirection() {
+        return _dir;
+    }
+
     public void SetBuffing(bool state) {
         _isBuffing = state;
     }
 
-    public override void AttackAnticipation() {
-        throw new System.Exception("Attack anticipation not implemented");
-    }
-    public override void Attack() {
-        throw new System.Exception("Attack not implemented");
-    }
-    public override void AttackRecovery() {
-        throw new System.Exception("Attack recovery not implemented");
+    private void Attack() {
+        if (!_isAttacking && Input.GetKeyDown(AttackAbilities[0].KeyToActivate)) {
+            StartCoroutine(Attacking());
+        }
     }
 
     IEnumerator JumpLand() {
@@ -399,6 +410,42 @@ public class PlayerController : Entity, IDamageable
         DodgePlayer.StopFeedbacks();
 
         _isDodging = false;
+    }
+
+    IEnumerator Attacking() {
+        _isAttacking = true;
+        float currentComboTime = 0;
+        int currentClicks = 0;
+        int totalClicks = 0;
+        SlashAbility currentAbility;
+        
+        AttackAbilities[currentClicks].Initialize(this.gameObject);
+        yield return null;
+        AttackAbilities[currentClicks].TriggerAbility();
+
+        currentClicks += 1;
+        totalClicks = currentClicks;
+
+        while(currentComboTime < Term && _isAttacking && currentClicks < AttackAbilities.Length) {
+            currentAbility = AttackAbilities[currentClicks];
+            if (!_slashActivator.GetActivated() && totalClicks > currentClicks) {
+                AttackAbilities[currentClicks].Initialize(this.gameObject);
+                AttackAbilities[currentClicks].TriggerAbility();
+                currentClicks += 1;
+                currentComboTime = 0;
+            } else if (!_slashActivator.GetActivated()) {
+                currentComboTime += Time.deltaTime;
+            }
+
+            if (Input.GetKeyDown(currentAbility.KeyToActivate)) {
+                totalClicks += 1;
+            }
+
+            yield return null;
+        }
+        yield return null;
+        _isAttacking = false;
+
     }
 
 }

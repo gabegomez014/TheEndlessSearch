@@ -32,6 +32,10 @@ public abstract class Activator : MonoBehaviour
     public void SetFeedbackPlayer(string name) {
         _feedbackPlayer = transform.Find(name).GetComponent<MMF_Player>();
 
+        if (_feedbackPlayer == null) {
+            Debug.LogWarning("Please specify the name of the Feedback for this ability");
+        }
+
         List<MMF_Sound> sounds = _feedbackPlayer.GetFeedbacksOfType<MMF_Sound>();
         List<MMF_Particles> particles = _feedbackPlayer.GetFeedbacksOfType<MMF_Particles>();
         
