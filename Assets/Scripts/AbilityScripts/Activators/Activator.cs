@@ -6,13 +6,18 @@ using MoreMountains.Feedbacks;
 public abstract class Activator : MonoBehaviour
 {
     public Animator Anim;
-    public PlayerController Player;
+    public Entity ControllingEntity;
 
     protected bool _activated;
+
+    protected int _manaCost;
     
     protected float _abilityCoolDown;
     protected float _abilityActivationTime;
     protected float _maxAbilityDuration;
+    protected float _castDuration;
+
+    protected float _deathDuration;
     protected MMF_Player _feedbackPlayer;
 
     protected KeyCode _keyToActivate;
@@ -27,9 +32,6 @@ public abstract class Activator : MonoBehaviour
     protected string _castAnimationParameterName;
     protected MMF_Sound _castSound;
     protected MMF_Particles _castParticles;
-    protected float _castDuration;
-
-    protected float _deathDuration;
 
     public void SetFeedbackPlayer(string name) {
         _feedbackPlayer = transform.Find(name).GetComponent<MMF_Player>();
@@ -95,6 +97,10 @@ public abstract class Activator : MonoBehaviour
 
     public void SetDeathDuration(float duration) {
         _deathDuration = duration;
+    }
+
+    public void SetManaCost(int cost) {
+        _manaCost = cost;
     }
 
     public bool GetActivated() {

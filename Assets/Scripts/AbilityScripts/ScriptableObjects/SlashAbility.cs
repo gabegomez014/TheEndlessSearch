@@ -26,6 +26,7 @@ public class SlashAbility : Ability
         _activator.SetAnticipationFeedbackLabel(AnticipationFeedbackLabel);
         _activator.SetCastFeedbackLabel(CastFeedbackLabel);
         _activator.SetFeedbackPlayer(FeedbacksPlayerName);
+        _activator.SetManaCost(ManaCost);
 
         // Slash activator specific sets
         _activator.SetSlashDistance(SlashDistance);

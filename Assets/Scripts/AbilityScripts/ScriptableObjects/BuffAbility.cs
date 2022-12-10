@@ -28,6 +28,7 @@ public class BuffAbility : Ability {
         _activator.SetAnticipationFeedbackLabel(AnticipationFeedbackLabel);
         _activator.SetCastFeedbackLabel(CastFeedbackLabel);
         _activator.SetFeedbackPlayer(FeedbacksPlayerName);
+        _activator.SetManaCost(ManaCost);
 
         // Buff activator specific sets
         _activator.SetIncreaseAmount(IncreaseAmount);

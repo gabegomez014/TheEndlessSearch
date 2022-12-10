@@ -6,6 +6,7 @@ using UnityEngine;
 public abstract class Ability : ScriptableObject
 {
     public string AbilityName = "New Ability";
+    public int ManaCost;
     public float AbilityBaseCoolDown = 1f;
     public float AbilityActivationTime;
     public KeyCode KeyToActivate; 

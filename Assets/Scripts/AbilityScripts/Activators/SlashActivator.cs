@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MoreMountains.Feedbacks;
 
 public class SlashActivator : Activator
 {
@@ -41,17 +42,23 @@ public class SlashActivator : Activator
     {
         RaycastHit hit;
 
+        _castParticles.Mode = MMF_Particles.Modes.Play;
+        _castSound.Active = true;
         _castSound.Play(transform.position);
         _castParticles.Play(transform.position);
         Anim.SetTrigger(_castAnimationParameterName);
 
-        Physics.Raycast(transform.position, new Vector3(Player.GetDirection(), 0), out hit, _slashDistance);
+        Physics.Raycast(transform.position, new Vector3(ControllingEntity.GetDirection(), 0), out hit, _slashDistance);
         if (hit.transform && hit.transform.tag == "Enemy") {
             // Hit the enemy once we got some enemies going
             // Also spawn Hit effect
         }
 
         yield return new WaitForSeconds(_deathDuration);
+        _castParticles.Stop(transform.position);
+        _castSound.Stop(transform.position);
+        _castParticles.Mode = MMF_Particles.Modes.Stop;
+        _castSound.Active = false;
         _feedbackPlayer.StopFeedbacks();
 
         yield return new WaitForSeconds(_abilityCoolDown);

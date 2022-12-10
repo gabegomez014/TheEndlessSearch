@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Heal
   m_EditorClassIdentifier: 
   AbilityName: Heal
-  AbilityBaseCoolDown: 1
+  ManaCost: 2
+  AbilityBaseCoolDown: 0.8
   AbilityActivationTime: 0.5
   KeyToActivate: 113
   MaxAbilityDuration: 1.5

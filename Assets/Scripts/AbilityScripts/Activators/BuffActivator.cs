@@ -46,7 +46,7 @@ public class BuffActivator : Activator
         _anticipationSound.Active = true;
         _anticipationSound.Play(transform.position);
 
-        while (currentTime < _anticipationDuration && Input.GetKey(_keyToActivate) && Player.GetBuffing()) {
+        while (currentTime < _anticipationDuration && ControllingEntity.GetBuffing()) {
             currentTime += Time.deltaTime;
             yield return null;
         }
@@ -56,7 +56,7 @@ public class BuffActivator : Activator
         _anticipationSound.Stop(transform.position);
         _anticipationSound.Active = false;
 
-         if ((Player.GetBuffing() == false || !Input.GetKey(KeyCode.T)) && currentTime < _anticipationDuration) {
+         if (ControllingEntity.GetBuffing() == false && currentTime < _anticipationDuration) {
             // Buff Canceled
             _feedbackPlayer.StopFeedbacks();
             Anim.SetBool(_anticipationAnimationParameterName, false);
@@ -64,7 +64,6 @@ public class BuffActivator : Activator
             yield break;
         }
 
-        // StartCoroutine(CastAction());
         Cast();
     }
 
@@ -83,7 +82,9 @@ public class BuffActivator : Activator
             yield return null;
         }
 
-        Player.SetBuffing(false);
+
+        ControllingEntity.SetBuffing(false);
+        ControllingEntity.ManaChange(-_manaCost);
 
         yield return new WaitForSeconds(_deathDuration);
         _castParticles.Stop(transform.position);
@@ -95,7 +96,7 @@ public class BuffActivator : Activator
 
         switch(_statToEffect) {
             case Stats.Health:
-                Player.Heal(_increaseAmount);
+                ControllingEntity.Heal(_increaseAmount);
                 break;
         }
 

@@ -72,13 +72,9 @@ public class PlayerController : Entity, IDamageable
 
     private bool _isDodging;
 
-    private bool _isBuffing;
-
     private bool _isAttacking;
 
     private Animator _anim;
-
-    private float _dir = 1;
 
     private CinemachineComposer _composer;
     
@@ -167,7 +163,7 @@ public class PlayerController : Entity, IDamageable
             TakeDamage(8);
         }
 
-        if (Input.GetKeyDown(HealAbility.KeyToActivate) && !_buffActivator.GetActivated()) {
+        if (Input.GetKeyDown(HealAbility.KeyToActivate) && !_buffActivator.GetActivated() && !_isAttacking) {
             _isBuffing = true;
             HealAbility.TriggerAbility();
         }
@@ -176,6 +172,10 @@ public class PlayerController : Entity, IDamageable
             _moveSound.Stop(transform.position);
             _moveSound.Active = false;
             MovePlayer.StopFeedbacks();
+        }
+
+        if (_isBuffing && Input.GetKeyUp(HealAbility.KeyToActivate)) {
+            _isBuffing = false;
         }
     }
 
@@ -356,34 +356,15 @@ public class PlayerController : Entity, IDamageable
         _anim.SetTrigger("Hit");
         _anim.SetBool("Healing", false);
     }
-    public void Heal(int heal) {
-        _currentHealth += heal;
-        if (_currentHealth > TotalHealth) {
-            _currentHealth = TotalHealth;
-        }
-
-        GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
-    }
 
     public void Die()
     {
         Destroy(this.gameObject);
     }
 
-    public bool GetBuffing() {
-        return _isBuffing;
-    }
-
-    public float GetDirection() {
-        return _dir;
-    }
-
-    public void SetBuffing(bool state) {
-        _isBuffing = state;
-    }
-
     private void Attack() {
         if (!_isAttacking && Input.GetKeyDown(AttackAbilities[0].KeyToActivate)) {
+            _isBuffing = false;
             StartCoroutine(Attacking());
         }
     }
@@ -423,6 +404,8 @@ public class PlayerController : Entity, IDamageable
         AttackAbilities[currentClicks].Initialize(this.gameObject);
         yield return null;
         AttackAbilities[currentClicks].TriggerAbility();
+        ManaChange(-AttackAbilities[currentClicks].ManaCost);
+        GameUIManager.Instance.UpdateMana((float) _currentMana / (float) TotalMana);
 
         currentClicks += 1;
         totalClicks = currentClicks;
@@ -432,6 +415,8 @@ public class PlayerController : Entity, IDamageable
             if (!_slashActivator.GetActivated() && totalClicks > currentClicks) {
                 AttackAbilities[currentClicks].Initialize(this.gameObject);
                 AttackAbilities[currentClicks].TriggerAbility();
+                ManaChange(-AttackAbilities[currentClicks].ManaCost);
+                GameUIManager.Instance.UpdateMana((float) _currentMana / (float) TotalMana);
                 currentClicks += 1;
                 currentComboTime = 0;
             } else if (!_slashActivator.GetActivated()) {
