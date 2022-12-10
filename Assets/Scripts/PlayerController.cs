@@ -164,8 +164,10 @@ public class PlayerController : Entity, IDamageable
         }
 
         if (Input.GetKeyDown(HealAbility.KeyToActivate) && !_buffActivator.GetActivated() && !_isAttacking) {
-            _isBuffing = true;
-            HealAbility.TriggerAbility();
+            if (_currentMana >= HealAbility.ManaCost) {
+                _isBuffing = true;
+                HealAbility.TriggerAbility();
+            }
         }
 
         if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D) || _isAttacking) {
