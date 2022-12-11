@@ -82,20 +82,31 @@ public class WolfEnemy : Enemy
         
         _anim.SetBool("Chasing", true);
         ChaseStartPlayer.StopFeedbacks();
-
-        _dir = (_player.transform.position - this.transform.position).normalized.x;
-        if (_dir <= -1) {
-            _dir = -1;
-        } else if (_dir >= 1) {
-            _dir = 1;
-        }
+        ChasePlayer.PlayFeedbacks();
 
         while (_state == AIState.Chase) {
+             _dir = (_player.transform.position - this.transform.position).normalized.x;
+            if (_dir <= -1) {
+                _dir = -1;
+            } else if (_dir >= 1) {
+                _dir = 1;
+            }
+
+            Quaternion rot = Quaternion.LookRotation(new Vector3(_dir,0));
+
+            _isRotating = true;
+            while (EntityMeshModel.transform.rotation != rot) {
+                EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, RotationSpeed * Time.deltaTime);
+                yield return null;
+            }
+            _isRotating = false;
+
             transform.position = transform.position + new Vector3(_dir * AttackMovementSpeed, 0, 0) * Time.deltaTime;
             yield return null;
         }
 
         _anim.SetBool("Chasing", false);
+        ChasePlayer.StopFeedbacks();
 
         yield return null;
     }
