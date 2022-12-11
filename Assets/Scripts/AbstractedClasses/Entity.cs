@@ -4,18 +4,25 @@ using UnityEngine;
 
 public abstract class Entity : MonoBehaviour
 {
+    public GameObject EntityMeshModel;
     public int TotalHealth;
     public int TotalMana;
+    public float MovementSpeed;
+    public string EnemyTag;
 
     protected int _currentHealth;
     protected int _currentMana;
     protected bool _isBuffing;
 
+    protected Animator _anim;
+
     protected float _dir = 1;
 
-    protected void Start() {
+    protected virtual void Start() {
         _currentHealth = TotalHealth;
         _currentMana = TotalMana;
+
+        _anim = EntityMeshModel.GetComponent<Animator>();
     }
 
     public virtual void Heal(int change) {

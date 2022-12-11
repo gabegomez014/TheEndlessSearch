@@ -6,9 +6,6 @@ using Cinemachine;
 
 public class PlayerController : Entity, IDamageable
 {
-    [Header("Player Model to manipulate")]
-    public GameObject PlayerModel;
-
     [Header("Camera look at position")]
     public Transform CameraLookAt;
 
@@ -74,8 +71,6 @@ public class PlayerController : Entity, IDamageable
 
     private bool _isAttacking;
 
-    private Animator _anim;
-
     private CinemachineComposer _composer;
     
     private Rigidbody _rb;
@@ -93,8 +88,8 @@ public class PlayerController : Entity, IDamageable
 
     private new void Start() {
         base.Start();
-        if (PlayerModel) {
-            _anim = PlayerModel.GetComponent<Animator>();
+        if (EntityMeshModel) {
+            _anim = EntityMeshModel.GetComponent<Animator>();
         } else {
             Debug.LogWarning("No Player Model attached");
         }
@@ -234,7 +229,7 @@ public class PlayerController : Entity, IDamageable
                 _anim.SetBool("Walk", false);
         }
 
-        PlayerModel.transform.rotation = Quaternion.Slerp(PlayerModel.transform.rotation, rot, SpeedRot * Time.deltaTime);
+        EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, SpeedRot * Time.deltaTime);
 
     }
 

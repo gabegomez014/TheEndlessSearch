@@ -209,7 +209,7 @@ Material:
     - _LightAffectRimLightColor: 0
     - _LightAffectShadow: 0
     - _LightFalloffAffectShadowT: 0
-    - _LightFalloffSoftness: 1
+    - _LightFalloffSoftness: 0.074
     - _LightIntensity: 1
     - _MCIALO: 0
     - _MCapIntensity: 1
