@@ -6,11 +6,13 @@ using MoreMountains.Feedbacks;
 public class WolfEnemy : Enemy
 {
 
+    public SlashAbility attack;
+
     protected override void Start() {
         base.Start();
         ResetEnemy();
         _patrolDirection = true;
-        _isRotating = false;    
+        _isRotating = false;   
 
         _currentWayPoint = 0;
         _nextWayPoint = 1;
@@ -73,7 +75,17 @@ public class WolfEnemy : Enemy
         }
     }
 
-    private IEnumerator Chase() {
+    protected override IEnumerator Hit() {
+        AIState currentState = _state;
+        _state = AIState.Hit;
+        _anim.SetTrigger("Hit");
+        HitPlayer.PlayFeedbacks();
+        yield return new WaitForSeconds(StunTime);
+        HitPlayer.StopFeedbacks();
+        _state = AIState.Attack;
+    }
+
+    protected override IEnumerator Chase() {
 
         ChaseStartPlayer.PlayFeedbacks();
         _anim.SetTrigger("ChaseStart");
@@ -95,7 +107,7 @@ public class WolfEnemy : Enemy
             Quaternion rot = Quaternion.LookRotation(new Vector3(_dir,0));
 
             _isRotating = true;
-            while (EntityMeshModel.transform.rotation != rot) {
+            while (EntityMeshModel.transform.rotation != rot && _state == AIState.Chase) {
                 EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, RotationSpeed * Time.deltaTime);
                 yield return null;
             }
@@ -111,7 +123,7 @@ public class WolfEnemy : Enemy
         yield return null;
     }
 
-    private IEnumerator Patrol() {
+    protected override IEnumerator Patrol() {
 
         _dir = (Waypoints[_nextWayPoint].position - Waypoints[_currentWayPoint].position).normalized.x;
         if (_dir <= -1) {
@@ -154,5 +166,15 @@ public class WolfEnemy : Enemy
 
         WalkPlayer.StopFeedbacks();
         _anim.SetBool("Walking", false);
+    }
+
+    protected override IEnumerator Attacking() {
+        yield return null;
+    }
+
+    protected override IEnumerator Dying()
+    {
+        _anim.SetTrigger("Dead");
+        yield return null;
     }
 }

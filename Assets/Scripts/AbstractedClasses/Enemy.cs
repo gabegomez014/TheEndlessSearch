@@ -18,9 +18,12 @@ public abstract class Enemy : Entity
     public float AttackMovementSpeed;
     public float MinimumDistanceFromEnemy;
     public float PauseBeforeChasing;
+    public float StunTime;
+    [Header("FX Players")]
     public MMF_Player WalkPlayer;
     public MMF_Player ChaseStartPlayer;
     public MMF_Player ChasePlayer;
+    public MMF_Player HitPlayer;
 
     protected bool _patrolDirection; // True = forward, false = backwards
     protected bool _isRotating;
@@ -35,14 +38,20 @@ public abstract class Enemy : Entity
 
     protected abstract void Chasing();
 
-    public virtual void TakeDamage(int damage) {
+    public override void TakeDamage(int damage) {
         _currentHealth -= damage;
         if (_currentHealth < 0) {
+            Debug.Log("Dead");
+            _collider.enabled = false;
+            StartCoroutine(Dying());
             _state = AIState.Dead;
+        } else {
+            StartCoroutine(Hit());
         }
     }
 
     protected virtual void ResetEnemy() {
+        _collider.enabled = true;
         _isRotating = false;
         _state = AIState.Idle;
         transform.position = Waypoints[0].position;
@@ -55,5 +64,20 @@ public abstract class Enemy : Entity
         _state = AIState.Idle;
     }
 
+    protected virtual IEnumerator Hit() {
+        AIState currentState = _state;
+        _state = AIState.Hit;
+        yield return new WaitForSeconds(StunTime);
+        _state = currentState;
+    }
+
     protected abstract void WaypointUpdate();
+
+    protected abstract IEnumerator Chase();
+
+    protected abstract IEnumerator Patrol();
+
+    protected abstract IEnumerator Attacking();
+
+    protected abstract IEnumerator Dying();
 }

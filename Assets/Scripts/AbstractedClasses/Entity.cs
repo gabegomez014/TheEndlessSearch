@@ -14,6 +14,8 @@ public abstract class Entity : MonoBehaviour
     protected int _currentMana;
     protected bool _isBuffing;
 
+    protected Collider _collider;
+
     protected Animator _anim;
 
     protected float _dir = 1;
@@ -23,6 +25,7 @@ public abstract class Entity : MonoBehaviour
         _currentMana = TotalMana;
 
         _anim = EntityMeshModel.GetComponent<Animator>();
+        _collider = GetComponent<Collider>();
     }
 
     public virtual void Heal(int change) {
@@ -47,6 +50,10 @@ public abstract class Entity : MonoBehaviour
         if (transform.tag == "Player") {
             GameUIManager.Instance.UpdateMana((float) _currentMana / (float) TotalMana);
         }
+    }
+
+    public virtual void TakeDamage(int damage) {
+        _currentHealth -= damage;
     }
 
     public bool GetBuffing() {

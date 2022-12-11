@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PlayerAttack1
   m_EditorClassIdentifier: 
   AbilityName: PlayerAttack1
+  ManaCost: 0
   AbilityBaseCoolDown: 0
   AbilityActivationTime: 0
   KeyToActivate: 323

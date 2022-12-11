@@ -10,6 +10,8 @@ public abstract class Activator : MonoBehaviour
 
     protected bool _activated;
 
+    protected string _enemyTag;
+
     protected int _manaCost;
     
     protected float _abilityCoolDown;
@@ -101,6 +103,10 @@ public abstract class Activator : MonoBehaviour
 
     public void SetManaCost(int cost) {
         _manaCost = cost;
+    }
+
+    public void SetEnemyTag(string tag) {
+        _enemyTag = tag;
     }
 
     public bool GetActivated() {

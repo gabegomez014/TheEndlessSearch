@@ -49,9 +49,11 @@ public class SlashActivator : Activator
         Anim.SetTrigger(_castAnimationParameterName);
 
         Physics.Raycast(transform.position, new Vector3(ControllingEntity.GetDirection(), 0), out hit, _slashDistance);
-        if (hit.transform && hit.transform.tag == "Enemy") {
+        if (hit.transform && hit.transform.tag == _enemyTag) {
             // Hit the enemy once we got some enemies going
             // Also spawn Hit effect
+            Entity enemy = hit.transform.GetComponent<Entity>();
+            enemy.TakeDamage(_damage);
         }
 
         yield return new WaitForSeconds(_deathDuration);

@@ -16,9 +16,6 @@ public class PlayerController : Entity, IDamageable
     [Tooltip("Rotation speed")]
     public float SpeedRot;
 
-    [Tooltip("Movement speed")]
-    public float SpeedMove;
-
     [Tooltip("Feedback to play on Move")]
     public MMF_Player MovePlayer;
 
@@ -104,6 +101,14 @@ public class PlayerController : Entity, IDamageable
         _slashActivator = GetComponent<SlashActivator>();
         _buffActivator = GetComponent<BuffActivator>();
 
+        if (_slashActivator) {
+            _slashActivator.SetEnemyTag(EnemyTag);
+        }
+
+        if (_buffActivator) {
+            _buffActivator.SetEnemyTag(EnemyTag);
+        }
+
         _jumpKeyHeld = false;
         _isJump = false;
 
@@ -116,6 +121,7 @@ public class PlayerController : Entity, IDamageable
 
         HealAbility.Initialize(this.gameObject);
         _isAttacking = false;
+        _anim.SetBool("IsGrounded", true);
     }
 
     private void Update()
@@ -127,10 +133,12 @@ public class PlayerController : Entity, IDamageable
 
         if (!_isJump && !_isFalling && !_isDodging)
         {
+
             Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
             if (_hit.transform == null || _hit.transform.gameObject.layer != LayerMask.NameToLayer("Ground")) {
                 _isFalling = true;
                 _anim.SetBool("IsFalling", true);
+                _anim.SetBool("IsGrounded", false);
                 Falling();
                 return;
             }
@@ -265,7 +273,7 @@ public class PlayerController : Entity, IDamageable
                 _moveSound.Active = true;
                 _moveSound.Play(transform.position);
             }
-            transform.position = transform.position + new Vector3(_dir * SpeedMove, 0, 0) * Time.deltaTime;
+            transform.position = transform.position + new Vector3(_dir * MovementSpeed, 0, 0) * Time.deltaTime;
             _anim.SetBool("Run", true);
                 _anim.SetBool("Walk", Input.GetKey(KeyCode.LeftControl));
         }
@@ -340,7 +348,7 @@ public class PlayerController : Entity, IDamageable
         return DodgeDistance / DodgeTime;
     }
 
-    public void TakeDamage(int damage) {
+    public override void TakeDamage(int damage) {
         _isBuffing = false;
         _currentHealth -= damage;
         GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
