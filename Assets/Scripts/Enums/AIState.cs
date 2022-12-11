@@ -8,5 +8,6 @@ public enum AIState
     Chase,
     Attack,
     Alert,
-    Sleep
+    Sleep,
+    Dead
 }

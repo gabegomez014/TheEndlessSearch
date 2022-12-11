@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MoreMountains.Feedbacks;
 
 public class WolfEnemy : Enemy
 {
+
     protected override void Start() {
         base.Start();
         ResetEnemy();
         _patrolDirection = true;
+        _isRotating = false;    
 
         _currentWayPoint = 0;
         _nextWayPoint = 1;
@@ -16,19 +19,31 @@ public class WolfEnemy : Enemy
             StartCoroutine(Patrol());
         }
     }
-    // private void Update() {
-    //     if (_state == AIState.Idle) {
-    //         Detection();
-    //         Movement();
-    //     }
-    // }
+    private void Update() {
+        if (_state == AIState.Idle && !_isRotating) {
+            Detection();
+        } else if (_state == AIState.Chase) {
+            Chasing();
+        }
+    }
     protected override void Detection()
     {
-        
+        RaycastHit hit;
+        Physics.Raycast(SightPosition.position, new Vector3(_dir, 0), out hit, SightDistance);
+        Debug.DrawRay(SightPosition.position, new Vector3(_dir * SightDistance, 0), Color.green, 0.1f);
+
+        if (hit.transform && hit.transform.tag == EnemyTag) {
+            _player = hit.transform.GetComponent<PlayerController>();
+            _state = AIState.Chase;
+            StartCoroutine(Chase());
+        }
     }
 
-    protected override void Movement()
+    protected override void Chasing()
     {
+        if (Vector3.Distance(this.transform.position, _player.transform.position) <= MinimumDistanceFromEnemy) {
+            _state = AIState.Attack;
+        }
     }
 
     protected override void WaypointUpdate() {
@@ -58,6 +73,33 @@ public class WolfEnemy : Enemy
         }
     }
 
+    private IEnumerator Chase() {
+
+        ChaseStartPlayer.PlayFeedbacks();
+        _anim.SetTrigger("ChaseStart");
+
+        yield return new WaitForSeconds(PauseBeforeChasing);
+        
+        _anim.SetBool("Chasing", true);
+        ChaseStartPlayer.StopFeedbacks();
+
+        _dir = (_player.transform.position - this.transform.position).normalized.x;
+        if (_dir <= -1) {
+            _dir = -1;
+        } else if (_dir >= 1) {
+            _dir = 1;
+        }
+
+        while (_state == AIState.Chase) {
+            transform.position = transform.position + new Vector3(_dir * AttackMovementSpeed, 0, 0) * Time.deltaTime;
+            yield return null;
+        }
+
+        _anim.SetBool("Chasing", false);
+
+        yield return null;
+    }
+
     private IEnumerator Patrol() {
 
         _dir = (Waypoints[_nextWayPoint].position - Waypoints[_currentWayPoint].position).normalized.x;
@@ -70,24 +112,36 @@ public class WolfEnemy : Enemy
         Quaternion rot = Quaternion.LookRotation(new Vector3(_dir,0));
         EntityMeshModel.transform.rotation = rot;
         _anim.SetBool("Walking", true);
+        WalkPlayer.PlayFeedbacks();
         
         while(_state == AIState.Idle) {
             transform.position = transform.position + new Vector3(_dir * MovementSpeed, 0, 0) * Time.deltaTime;
 
             if (Vector3.Distance(transform.position, Waypoints[_nextWayPoint].position) < 0.5f) {
 
+                WalkPlayer.StopFeedbacks();
                 _anim.SetBool("Walking", false);
                 WaypointUpdate();
                 yield return new WaitForSeconds(TimeSpentAtWaypoint);
                 rot = Quaternion.LookRotation(new Vector3(_dir, 0));
+                _isRotating = true;
                 while (EntityMeshModel.transform.rotation != rot) {
                     EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, RotationSpeed * Time.deltaTime);
                     yield return null;
                 }
-                _anim.SetBool("Walking", true);
-            }
+                _isRotating = false;
 
+                if (_state != AIState.Idle) {
+                    yield break;
+                }
+
+                _anim.SetBool("Walking", true);
+                WalkPlayer.PlayFeedbacks();
+            }
             yield return null;
         }
+
+        WalkPlayer.StopFeedbacks();
+        _anim.SetBool("Walking", false);
     }
 }
