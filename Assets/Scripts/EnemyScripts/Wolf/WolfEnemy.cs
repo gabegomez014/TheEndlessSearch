@@ -15,7 +15,6 @@ public class WolfEnemy : Enemy
 
     public override void TakeDamage(int damage) {
         _currentHealth -= damage;
-        Debug.Log(_currentHealth);
         if (_currentHealth <= 0) {
             _collider.enabled = false;
             _anim.SetBool("Attacking", false);
