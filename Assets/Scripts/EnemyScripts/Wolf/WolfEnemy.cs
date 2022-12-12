@@ -6,7 +6,21 @@ using MoreMountains.Feedbacks;
 public class WolfEnemy : Enemy
 {
 
+    [Header("Wolf Enemy Specific Information")]
     public SlashAbility attack;
+    public Transform[] HitPositions;
+    public Transform HitVFX;
+
+    public override void TakeDamage(int damage) {
+        _currentHealth -= damage;
+        if (_currentHealth < 0) {
+            _collider.enabled = false;
+            StartCoroutine(Dying());
+            _state = AIState.Dead;
+        } else {
+            StartCoroutine(Hit());
+        }
+    }
 
     protected override void Start() {
         base.Start();
@@ -53,7 +67,6 @@ public class WolfEnemy : Enemy
             _state = AIState.Attack;
             StartCoroutine(Attack());
         } else if (Vector3.Distance(this.transform.position, _chaseStartPosition) >= MaxChaseDistance) {
-            Debug.Log("Sleep");
             _state = AIState.Sleep;
             _player = null;
             StartCoroutine(Sleep());
@@ -107,6 +120,15 @@ public class WolfEnemy : Enemy
     protected override IEnumerator Hit() {
         AIState currentState = _state;
         _state = AIState.Hit;
+
+        while(_player == null) {
+            yield return null;
+        }
+
+        int position = (Mathf.Round(_player.GetDirection() + GetDirection()) == 0) ? 0 : 1;
+        
+        HitVFX.transform.position = HitPositions[position].position;
+        
         _anim.SetTrigger("Hit");
         HitPlayer.PlayFeedbacks();
         yield return new WaitForSeconds(StunTime);

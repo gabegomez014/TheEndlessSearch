@@ -19,6 +19,8 @@ public abstract class Enemy : Entity
     public float AttackDistance;
 
     public float MaxChaseDistance;
+
+    [Header("Enemy AI Timing information")]
     public float PauseBeforeChasing;
     public float SleepTime;
     public float StunTime;
@@ -49,10 +51,13 @@ public abstract class Enemy : Entity
 
     protected abstract void Sleeping();
 
+    public virtual void SetPlayer(Transform player) {
+        _player = player.GetComponent<PlayerController>();
+    }
+
     public override void TakeDamage(int damage) {
         _currentHealth -= damage;
         if (_currentHealth < 0) {
-            Debug.Log("Dead");
             _collider.enabled = false;
             StartCoroutine(Dying());
             _state = AIState.Dead;

@@ -54,6 +54,11 @@ public class SlashActivator : Activator
             // Also spawn Hit effect
             Entity enemy = hit.transform.GetComponent<Entity>();
             enemy.TakeDamage(_damage);
+
+            if (hit.transform.tag == "Enemy") {
+                Enemy enemyAI = enemy as Enemy;
+                enemyAI.SetPlayer(this.transform);
+            }
         }
 
         yield return new WaitForSeconds(_deathDuration);
