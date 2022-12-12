@@ -29,6 +29,7 @@ public abstract class Enemy : Entity
     public MMF_Player ChasePlayer;
     public MMF_Player HitPlayer;
     public MMF_Player DeathPlayer;
+    public MMF_Player SleepPlayer;
 
     protected bool _patrolDirection; // True = forward, false = backwards
     protected bool _isRotating;

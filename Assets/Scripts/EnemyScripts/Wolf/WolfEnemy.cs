@@ -167,7 +167,10 @@ public class WolfEnemy : Enemy
         Quaternion rot = Quaternion.LookRotation(new Vector3(_dir,0));
         EntityMeshModel.transform.rotation = rot;
         _anim.SetBool("Walking", true);
-        WalkPlayer.PlayFeedbacks();
+
+        if (!WalkPlayer.IsPlaying) {
+            WalkPlayer.PlayFeedbacks();
+        }
         
         while(_state == AIState.Idle) {
             transform.position = transform.position + new Vector3(_dir * MovementSpeed, 0, 0) * Time.deltaTime;
@@ -240,8 +243,11 @@ public class WolfEnemy : Enemy
         ChaseStartPlayer.StopFeedbacks();
 
         _anim.SetTrigger("Sleep");
+        SleepPlayer.PlayFeedbacks();
 
         yield return new WaitForSeconds(SleepTime);
+
+        SleepPlayer.StopFeedbacks();
 
         _dir = (Waypoints[_currentWayPoint].position - this.transform.position).normalized.x;
         if (_dir <= -1) {
@@ -283,7 +289,9 @@ public class WolfEnemy : Enemy
             yield return null;
         }
 
-        WalkPlayer.StopFeedbacks();
+        if (_state != AIState.Idle) {
+            WalkPlayer.StopFeedbacks();
+        }
         yield return null;
     }
 }
