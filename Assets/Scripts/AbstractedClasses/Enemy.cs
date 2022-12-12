@@ -66,7 +66,7 @@ public abstract class Enemy : Entity
 
     public override void TakeDamage(int damage) {
         _currentHealth -= damage;
-        if (_currentHealth < 0) {
+        if (_currentHealth <= 0) {
             _collider.enabled = false;
             StartCoroutine(Dying());
             _state = AIState.Dead;
