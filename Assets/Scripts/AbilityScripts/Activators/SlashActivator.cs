@@ -8,6 +8,8 @@ public class SlashActivator : Activator
     private float _slashDistance;
     private int _damage;
 
+    private Enemy enemyAI;
+
 
     private void Start() {
         _activated = false;
@@ -22,7 +24,13 @@ public class SlashActivator : Activator
 
     public override void Activate()
     {
+
         if (!_activated) {
+            if (transform.tag == "Enemy") {
+                Anim.ResetTrigger(_anticipationAnimationParameterName);
+                Anim.ResetTrigger(_castAnimationParameterName);
+                enemyAI = this.transform.GetComponent<Enemy>();
+            }
             _activated = true;
             _feedbackPlayer.PlayFeedbacks();
             if (_anticipationDuration > 0) {
@@ -35,7 +43,28 @@ public class SlashActivator : Activator
 
     public override IEnumerator AnticipationAction()
     {
-        throw new System.NotImplementedException();
+        float currentTime = 0;
+        _anticipationParticles.Mode = MMF_Particles.Modes.Play;
+        _anticipationSound.Active = true;
+        _anticipationSound.Play(transform.position);
+        _anticipationParticles.Play(transform.position);
+        Anim.SetTrigger(_anticipationAnimationParameterName);
+
+        while (enemyAI && enemyAI.GetState() == AIState.Attack && currentTime < _anticipationDuration) {
+            currentTime += Time.deltaTime;
+            yield return null;
+        }
+        _anticipationSound.Stop(transform.position);
+        _anticipationParticles.Stop(transform.position);
+        _anticipationParticles.Mode = MMF_Particles.Modes.Stop;
+        _anticipationSound.Active = false;
+
+        if (currentTime >= _anticipationDuration) {
+            StartCoroutine(CastAction());
+        } else {
+            _activated = false;
+            yield break;
+        }
     }
 
     public override IEnumerator CastAction()
@@ -46,6 +75,7 @@ public class SlashActivator : Activator
         _castSound.Active = true;
         _castSound.Play(transform.position);
         _castParticles.Play(transform.position);
+        
         Anim.SetTrigger(_castAnimationParameterName);
 
         Physics.Raycast(transform.position, new Vector3(ControllingEntity.GetDirection(), 0), out hit, _slashDistance);
@@ -56,7 +86,7 @@ public class SlashActivator : Activator
             enemy.TakeDamage(_damage);
 
             if (hit.transform.tag == "Enemy") {
-                Enemy enemyAI = enemy as Enemy;
+                enemyAI = enemy as Enemy;
                 enemyAI.SetPlayer(this.transform);
             }
         }

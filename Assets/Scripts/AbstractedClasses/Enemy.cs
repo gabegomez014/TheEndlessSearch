@@ -35,6 +35,7 @@ public abstract class Enemy : Entity
 
     protected bool _patrolDirection; // True = forward, false = backwards
     protected bool _isRotating;
+    protected bool _isAnticipatingAttack;
     protected int _currentWayPoint;
     protected int _nextWayPoint;
     protected Vector3 _chaseStartPosition;
@@ -53,6 +54,14 @@ public abstract class Enemy : Entity
 
     public virtual void SetPlayer(Transform player) {
         _player = player.GetComponent<PlayerController>();
+    }
+
+    public virtual bool GetIsAnticipatingAttack() {
+        return _isAnticipatingAttack;
+    }
+
+    public virtual AIState GetState() {
+        return _state;
     }
 
     public override void TakeDamage(int damage) {
@@ -85,6 +94,7 @@ public abstract class Enemy : Entity
         _state = AIState.Hit;
         yield return new WaitForSeconds(StunTime);
         _state = currentState;
+        StartCoroutine(Attack());
     }
 
     protected abstract void WaypointUpdate();

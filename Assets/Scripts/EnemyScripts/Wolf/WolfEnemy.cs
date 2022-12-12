@@ -11,10 +11,13 @@ public class WolfEnemy : Enemy
     public Transform[] HitPositions;
     public Transform HitVFX;
 
+    private SlashActivator _slashActivator;
+
     public override void TakeDamage(int damage) {
         _currentHealth -= damage;
         if (_currentHealth < 0) {
             _collider.enabled = false;
+            _anim.SetBool("Attacking", false);
             StartCoroutine(Dying());
             _state = AIState.Dead;
         } else {
@@ -34,6 +37,15 @@ public class WolfEnemy : Enemy
         if (Waypoints.Length > 0) {
             StartCoroutine(Patrol());
         }
+
+        _slashActivator = GetComponent<SlashActivator>();
+        attack.Initialize(this.gameObject);
+
+        if (_slashActivator) {
+            _slashActivator.SetEnemyTag(EnemyTag);
+        }
+
+        _isAnticipatingAttack = false;
     }
     private void Update() {
         if ((_state == AIState.Idle || _state == AIState.Sleep) && !_isRotating) {
@@ -118,6 +130,9 @@ public class WolfEnemy : Enemy
     }
 
     protected override IEnumerator Hit() {
+        _anim.ResetTrigger("AttackStart");
+        _anim.SetTrigger("Hit");
+        _anim.SetBool("Chasing", false);
         AIState currentState = _state;
         _state = AIState.Hit;
 
@@ -129,11 +144,16 @@ public class WolfEnemy : Enemy
         
         HitVFX.transform.position = HitPositions[position].position;
         
-        _anim.SetTrigger("Hit");
         HitPlayer.PlayFeedbacks();
         yield return new WaitForSeconds(StunTime);
         HitPlayer.StopFeedbacks();
-        _state = AIState.Attack;
+
+        if (_currentHealth > 0) {
+            _state = AIState.Attack;
+            StartCoroutine(Attack());
+            _anim.SetTrigger("Attack");
+
+        }
     }
 
     protected override IEnumerator Chase(bool startFlag = true) {
@@ -244,6 +264,11 @@ public class WolfEnemy : Enemy
                 yield return null;
             }
             _isRotating = false;
+
+            if (!_slashActivator.GetActivated()) {
+                _anim.SetTrigger("Attack");
+                attack.TriggerAbility();
+            }
 
             yield return null;
         }
