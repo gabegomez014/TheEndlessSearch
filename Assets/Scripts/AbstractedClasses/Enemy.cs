@@ -16,19 +16,25 @@ public abstract class Enemy : Entity
     [Header("Enemy AI Movement information")]
     public float RotationSpeed;
     public float AttackMovementSpeed;
-    public float MinimumDistanceFromEnemy;
+    public float AttackDistance;
+
+    public float MaxChaseDistance;
     public float PauseBeforeChasing;
+    public float SleepTime;
     public float StunTime;
+    public float DeathTime;
     [Header("FX Players")]
     public MMF_Player WalkPlayer;
     public MMF_Player ChaseStartPlayer;
     public MMF_Player ChasePlayer;
     public MMF_Player HitPlayer;
+    public MMF_Player DeathPlayer;
 
     protected bool _patrolDirection; // True = forward, false = backwards
     protected bool _isRotating;
     protected int _currentWayPoint;
     protected int _nextWayPoint;
+    protected Vector3 _chaseStartPosition;
     protected PlayerController _player;
 
 
@@ -37,6 +43,10 @@ public abstract class Enemy : Entity
     protected abstract void Detection();
 
     protected abstract void Chasing();
+
+    protected abstract void Attacking();
+
+    protected abstract void Sleeping();
 
     public override void TakeDamage(int damage) {
         _currentHealth -= damage;
@@ -73,11 +83,13 @@ public abstract class Enemy : Entity
 
     protected abstract void WaypointUpdate();
 
-    protected abstract IEnumerator Chase();
+    protected abstract IEnumerator Chase(bool startFlag = true);
 
     protected abstract IEnumerator Patrol();
 
-    protected abstract IEnumerator Attacking();
+    protected abstract IEnumerator Attack();
 
     protected abstract IEnumerator Dying();
+
+    protected abstract IEnumerator Sleep();
 }

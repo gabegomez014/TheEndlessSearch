@@ -22,19 +22,25 @@ public class WolfEnemy : Enemy
         }
     }
     private void Update() {
-        if (_state == AIState.Idle && !_isRotating) {
+        if ((_state == AIState.Idle || _state == AIState.Sleep) && !_isRotating) {
             Detection();
         } else if (_state == AIState.Chase) {
             Chasing();
+        } else if (_state == AIState.Attack) {
+            Attacking();
+        }
+
+        if (_state == AIState.Sleep) {
+            Sleeping();
         }
     }
     protected override void Detection()
     {
         RaycastHit hit;
         Physics.Raycast(SightPosition.position, new Vector3(_dir, 0), out hit, SightDistance);
-        Debug.DrawRay(SightPosition.position, new Vector3(_dir * SightDistance, 0), Color.green, 0.1f);
 
         if (hit.transform && hit.transform.tag == EnemyTag) {
+            _chaseStartPosition = this.transform.position;
             _player = hit.transform.GetComponent<PlayerController>();
             _state = AIState.Chase;
             StartCoroutine(Chase());
@@ -43,8 +49,31 @@ public class WolfEnemy : Enemy
 
     protected override void Chasing()
     {
-        if (Vector3.Distance(this.transform.position, _player.transform.position) <= MinimumDistanceFromEnemy) {
+        if (Vector3.Distance(this.transform.position, _player.transform.position) <= AttackDistance) {
             _state = AIState.Attack;
+            StartCoroutine(Attack());
+        } else if (Vector3.Distance(this.transform.position, _chaseStartPosition) >= MaxChaseDistance) {
+            Debug.Log("Sleep");
+            _state = AIState.Sleep;
+            _player = null;
+            StartCoroutine(Sleep());
+        }
+    }
+
+    protected override void Attacking()
+    {
+        if (Vector3.Distance(this.transform.position, _player.transform.position) > AttackDistance) {
+            _state = AIState.Chase;
+            _anim.SetTrigger("AttackChase");
+            StartCoroutine(Chase(false));
+        }
+    }
+
+    protected override void Sleeping()
+    {
+        if (Vector3.Distance(this.transform.position, Waypoints[_currentWayPoint].position) < 0.5f) {
+            _state = AIState.Idle;
+            StartCoroutine(Patrol());
         }
     }
 
@@ -85,12 +114,15 @@ public class WolfEnemy : Enemy
         _state = AIState.Attack;
     }
 
-    protected override IEnumerator Chase() {
+    protected override IEnumerator Chase(bool startFlag = true) {
 
-        ChaseStartPlayer.PlayFeedbacks();
-        _anim.SetTrigger("ChaseStart");
 
-        yield return new WaitForSeconds(PauseBeforeChasing);
+        if (startFlag) {
+            ChaseStartPlayer.PlayFeedbacks();
+            _anim.SetTrigger("ChaseStart");
+
+            yield return new WaitForSeconds(PauseBeforeChasing);
+        }
         
         _anim.SetBool("Chasing", true);
         ChaseStartPlayer.StopFeedbacks();
@@ -168,13 +200,90 @@ public class WolfEnemy : Enemy
         _anim.SetBool("Walking", false);
     }
 
-    protected override IEnumerator Attacking() {
+    protected override IEnumerator Attack() {
+
+        _anim.SetBool("Attacking", true);
+        while (_state == AIState.Attack) {
+            _dir = (_player.transform.position - this.transform.position).normalized.x;
+            if (_dir <= -1) {
+                _dir = -1;
+            } else if (_dir >= 1) {
+                _dir = 1;
+            }
+
+            Quaternion rot = Quaternion.LookRotation(new Vector3(_dir,0));
+
+            _isRotating = true;
+            while (EntityMeshModel.transform.rotation != rot && _state == AIState.Attack) {
+                EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, RotationSpeed * Time.deltaTime);
+                yield return null;
+            }
+            _isRotating = false;
+
+            yield return null;
+        }
         yield return null;
     }
 
     protected override IEnumerator Dying()
     {
         _anim.SetTrigger("Dead");
+        DeathPlayer.PlayFeedbacks();
+        yield return new WaitForSeconds(DeathTime);
+        DeathPlayer.StopFeedbacks();
+    }
+
+    protected override IEnumerator Sleep() {
+        _anim.SetBool("Attacking", false);
+        _anim.SetBool("Chasing", false);
+        ChasePlayer.StopFeedbacks();
+        ChaseStartPlayer.StopFeedbacks();
+
+        _anim.SetTrigger("Sleep");
+
+        yield return new WaitForSeconds(SleepTime);
+
+        _dir = (Waypoints[_currentWayPoint].position - this.transform.position).normalized.x;
+        if (_dir <= -1) {
+            _dir = -1;
+        } else if (_dir >= 1) {
+            _dir = 1;
+        }
+
+        Quaternion rot = Quaternion.LookRotation(new Vector3(_dir,0));
+
+        _isRotating = true;
+        while (EntityMeshModel.transform.rotation != rot && _state == AIState.Sleep) {
+            EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, RotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        _anim.SetBool("Walking", true);
+        WalkPlayer.PlayFeedbacks();
+
+        while (_state == AIState.Sleep) {
+            this.transform.position = this.transform.position + new Vector3(_dir, 0) * Time.deltaTime * MovementSpeed;
+
+            _dir = (Waypoints[_currentWayPoint].position - this.transform.position).normalized.x;
+            if (_dir <= -1) {
+                _dir = -1;
+            } else if (_dir >= 1) {
+                _dir = 1;
+            }
+
+            rot = Quaternion.LookRotation(new Vector3(_dir,0));
+
+            _isRotating = true;
+            while (EntityMeshModel.transform.rotation != rot && _state == AIState.Sleep) {
+                EntityMeshModel.transform.rotation = Quaternion.Slerp(EntityMeshModel.transform.rotation, rot, RotationSpeed * Time.deltaTime);
+                yield return null;
+            }
+            _isRotating = false;
+            
+            yield return null;
+        }
+
+        WalkPlayer.StopFeedbacks();
         yield return null;
     }
 }
