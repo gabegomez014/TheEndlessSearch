@@ -51,6 +51,15 @@ public class PlayerController : Entity, IDamageable
     [Header("Time available for Attack combo")]
     public float Term;
 
+    [Header("Damage info")]
+    [Tooltip("Damage for running into an Enemy")]
+    public int DamageByCollision;
+    [Tooltip("How far the player is launched when they collide with an enemy")]
+    public float LaunchSpeed;
+    [Tooltip("Multipier for how far the player is launched while in the jump state")]
+    public float JumpMultiplier;
+    public float HitInvincibilityTime;
+
     [Header("Feedback to play on being hit")]
     public MMF_Player HitPlayer;
 
@@ -67,6 +76,8 @@ public class PlayerController : Entity, IDamageable
     private bool _isDodging;
 
     private bool _isAttacking;
+
+    private bool _isHit;
 
     private CinemachineComposer _composer;
     
@@ -162,10 +173,6 @@ public class PlayerController : Entity, IDamageable
             Falling();
         }
 
-        if (Input.GetKeyDown(KeyCode.H)) {
-            TakeDamage(8);
-        }
-
         if (Input.GetKeyDown(HealAbility.KeyToActivate) && !_buffActivator.GetActivated() && !_isAttacking) {
             if (_currentMana >= HealAbility.ManaCost) {
                 _isBuffing = true;
@@ -244,6 +251,18 @@ public class PlayerController : Entity, IDamageable
     
     void Move()
     {
+        if (!_isHit) {
+            Physics.Raycast(transform.position, new Vector3(_dir,0), out _hit, _raycastDistance);
+
+            if (_hit.transform && _hit.transform.tag == EnemyTag) {
+                TakeDamage(DamageByCollision);
+                _rb.AddForce(new Vector3(-_dir, 0) * LaunchSpeed, ForceMode.Impulse);
+                _anim.SetTrigger("Hit");
+                _anim.SetBool("Run", false);
+                return;
+            }
+        }
+
         if (_isJump)
         {   
             _moveParticles.Stop(transform.position);
@@ -275,7 +294,6 @@ public class PlayerController : Entity, IDamageable
             }
             transform.position = transform.position + new Vector3(_dir * MovementSpeed, 0, 0) * Time.deltaTime;
             _anim.SetBool("Run", true);
-                _anim.SetBool("Walk", Input.GetKey(KeyCode.LeftControl));
         }
     }
 
@@ -292,6 +310,7 @@ public class PlayerController : Entity, IDamageable
 
     void Jump() {
         if (Input.GetKeyDown(KeyCode.Space)) {
+            _isHit = false;
             _isBuffing = false;
             _jumpKeyHeld = true;
             _isJump = true;
@@ -309,8 +328,10 @@ public class PlayerController : Entity, IDamageable
             _jumpKeyHeld = false;
         } else if (_rb.velocity.y < 0) {
             _isFalling = true;
+            _anim.SetBool("IsFalling", true);
             Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
             if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+                _isHit = false;
                 JumpPlayer.StopFeedbacks();
                 StartCoroutine(JumpLand());
                 _isJump = false;
@@ -320,13 +341,20 @@ public class PlayerController : Entity, IDamageable
                 _anim.SetBool("IsFalling", false);
                 CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
             }
+
+            if (_hit.transform != null && _hit.distance <= 0.5f && _hit.transform.tag == "Enemy" && !_isHit) {
+                TakeDamage(DamageByCollision);
+                _rb.AddForce(new Vector3(-_dir, 1) * LaunchSpeed * JumpMultiplier, ForceMode.Impulse);
+            }
         }
     }
 
     private void Falling() {
+        _anim.SetBool("IsFalling", true);
         if (!_isDodging) {
             Physics.Raycast(transform.position, Vector3.down, out _hit, _raycastDistance);
             if (_hit.transform != null && _hit.distance <= 0.5f && _rb.velocity.y <= 0 && _hit.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) {
+                _isHit = false;
                 JumpPlayer.StopFeedbacks();
                 StartCoroutine(JumpLand());
                 _isJump = false;
@@ -336,6 +364,11 @@ public class PlayerController : Entity, IDamageable
                 CameraLookAt.transform.position = new Vector3(CameraLookAt.transform.position.x, transform.position.y, 0);
             } else {
                 _rb.AddForce(new Vector3(0, CounterJumpForce) * _rb.mass);
+            }
+
+            if (_hit.transform != null && _hit.distance <= 0.5f && _hit.transform.tag == "Enemy" && !_isHit) {
+                TakeDamage(DamageByCollision);
+                _rb.AddForce(new Vector3(-_dir, 1) * LaunchSpeed * JumpMultiplier, ForceMode.Impulse);
             }
         }
     }
@@ -349,7 +382,6 @@ public class PlayerController : Entity, IDamageable
     }
 
     public override void TakeDamage(int damage) {
-        _isBuffing = false;
         _currentHealth -= damage;
         GameUIManager.Instance.UpdateHealth((float) _currentHealth / (float) TotalHealth);
         if (_currentHealth <= 0) {
@@ -357,9 +389,7 @@ public class PlayerController : Entity, IDamageable
             Die();
         }
 
-        HitPlayer.PlayFeedbacks();
-        _anim.SetTrigger("Hit");
-        _anim.SetBool("Healing", false);
+        StartCoroutine(HitInvincibility());
     }
 
     public void Die()
@@ -372,6 +402,22 @@ public class PlayerController : Entity, IDamageable
             _isBuffing = false;
             StartCoroutine(Attacking());
         }
+    }
+
+    IEnumerator HitInvincibility() {
+        float currentTime = 0;
+        _isHit = true;
+        _isBuffing = false;
+        HitPlayer.PlayFeedbacks();
+        _anim.SetTrigger("Hit");
+        _anim.SetBool("Healing", false);
+        while(currentTime < HitInvincibilityTime && _isHit) {
+            currentTime += Time.deltaTime;
+            yield return null;
+        }
+        HitPlayer.StopFeedbacks();
+        _isHit = false;
+        
     }
 
     IEnumerator JumpLand() {
