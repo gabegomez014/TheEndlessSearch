@@ -8,16 +8,20 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: SimpleFloorMat
-  m_Shader: {fileID: 4800000, guid: 6459b2db96a08ca41b0f9b39dc7ad59e, type: 3}
+  m_Shader: {fileID: 4800000, guid: 06aa19b87b8aa174485b5a0ed989e1cb, type: 3}
   m_ValidKeywords:
+  - USE_AL
+  - USE_LS
+  - USE_RT
+  - USE_WC
+  m_InvalidKeywords:
   - N_F_EAL_ON
   - N_F_O_ON
   - N_F_RDC_ON
   - N_F_RELGI_ON
   - N_F_SS_ON
-  - N_F_TRANSAFFSHA_ON
-  m_InvalidKeywords:
   - N_F_TRANSAFFSHA
+  - N_F_TRANSAFFSHA_ON
   - _CUSTOMLIGHTDIRECTIONFOLLOWOBJECTROTATION_OFF
   - _GIFLATSHADE_OFF
   - _GLOSSTEXTUREFOLLOWOBJECTROTATION_OFF
@@ -58,6 +62,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Control0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Control1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -78,7 +90,23 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _FlowTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FogTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _GlossTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _IceTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _LittleSpec:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -91,6 +119,38 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask4:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask5:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask6:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask7:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -114,7 +174,43 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Normal0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal4:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal5:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal6:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal7:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -130,7 +226,15 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _ParallaxLayers:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Roughness:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -146,7 +250,51 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SnowHeight:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SnowTransition:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat0:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 1}
+    - _Splat1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 1}
+    - _Splat2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 1}
+    - _Splat3:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 1}
+    - _Splat4:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat5:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat6:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Splat7:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _UnderWaterFish:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -164,6 +312,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AddSnowStrength: 0.52
     - _AlphaBaseCutout: 1
     - _AlphaClip: 0
     - _BleModDest: 0
@@ -184,12 +333,24 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _DirectionalLightIntensity: 0
+    - _DisplacementColorMult: 0.95
+    - _DisplacementOffset: 0.1
+    - _DisplacementShadowMult: 0.56
+    - _DisplacementStrength: 0.3
     - _DoubleSidedOutline: 1
     - _DstBlend: 0
     - _DynamicNoisyOutline: 0
     - _EnvironmentReflections: 1
     - _EnvironmentalLightingIntensity: 1
     - _FarDistanceMaxWidth: 10
+    - _FishAngle: 0
+    - _FishIntensity: 1
+    - _FishMaskIntensity: 0.25
+    - _FishScale: 1
+    - _FishSpeed: 1
+    - _FlowMultiplier: 0.3
+    - _FogIntensity: 0.3
+    - _FogScale: 1
     - _GIFlatShade: 0
     - _GIShadeThreshold: 0
     - _GlossColorPower: 10
@@ -203,19 +364,36 @@ Material:
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Glow_Edge_Width: 1
+    - _HeightScale: 0.33
     - _HighlightColorPower: 1
+    - _ISADD: 0
+    - _ISICE: 0
+    - _IST: 0
+    - _IceScale: 1
     - _LigIgnoYNorDir: 0
     - _LightAffectOutlineColor: 0
     - _LightAffectRimLightColor: 0
     - _LightAffectShadow: 0
     - _LightFalloffAffectShadowT: 0
     - _LightFalloffSoftness: 0.074
+    - _LightHardness: 0.686
     - _LightIntensity: 1
+    - _LightOffset: 0.2
+    - _LittleSpecForce: 0.5
     - _MCIALO: 0
     - _MCapIntensity: 1
     - _MVCOL: 0
     - _MaiColPo: 0.8
+    - _MainTexMult: 0.11
     - _Metallic: 0
+    - _Metallic0: 0
+    - _Metallic1: 0
+    - _Metallic2: 0
+    - _Metallic3: 0
+    - _Metallic4: 0
+    - _Metallic5: 0
+    - _Metallic6: 0
+    - _Metallic7: 0
     - _MixMainTexToOutline: 0
     - _N_F_CA: 0
     - _N_F_CLD: 0
@@ -249,16 +427,32 @@ Material:
     - _N_F_STIS: 0
     - _NoisyOutlineIntensity: 0
     - _NormalMapIntensity: 1
+    - _NormalMultiplier: 0.4
+    - _NormalRTDepth: 0.12
+    - _NormalRTStrength: 2.2
+    - _NormalScale: 0.766
+    - _NormalScale0: 1
+    - _NormalScale1: 1
+    - _NormalScale2: 1
+    - _NormalScale3: 1
+    - _NormalScale4: 1
+    - _NormalScale5: 1
+    - _NormalScale6: 1
+    - _NormalScale7: 1
+    - _NormalVector: 0
     - _OcclusionStrength: 1
+    - _OffsetScale: 0.14
     - _Opacity: 1
     - _Oper: 0
     - _OutlineExtrudeMethod: 0
     - _OutlineWidth: 0.5
     - _OutlineWidthAffectedByViewDistance: 0
     - _OutlineZPostionInCamera: 0
+    - _OverallScale: 1
     - _OverallShadowColorPower: 1
     - _PSGLOTEX: 0
     - _PTexturePower: 1
+    - _ParalaxColorScale: -0.88
     - _Parallax: 0.005
     - _PointSpotlightIntensity: 0
     - _QueueOffset: 0
@@ -268,12 +462,16 @@ Material:
     - _RefMetallic: 0
     - _RefVal: 0
     - _ReflectionIntensity: 0
+    - _ReflectionOpacity: 0.25
     - _ReflectionRoughtness: 0
+    - _ReflectionStrength: 0.07
+    - _RemoveSnowStrength: 0.5
     - _RimLigInt: 1
     - _RimLightColorPower: 10
     - _RimLightInLight: 1
     - _RimLightSoftness: 1
     - _RimLightUnfill: 1.5
+    - _RoughnessStrength: 1.75
     - _SPECIN: 1
     - _SPECMODE: 0
     - _STIL: 0
@@ -294,6 +492,8 @@ Material:
     - _ShadowTIntensity: 1
     - _ShadowTLightThreshold: 50
     - _ShadowTShadowThreshold: 0
+    - _ShininessIce: 10
+    - _ShininessSnow: 25
     - _ShowInAmbientLightShadowIntensity: 1
     - _ShowInAmbientLightShadowThreshold: 0.4
     - _ShowNormal: 0
@@ -302,16 +502,31 @@ Material:
     - _SmoothObjectNormal: 0
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
+    - _SnowNormalScale: 1
+    - _SnowScale: 1
+    - _SpecForce: 3
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Surface: 0
     - _TEXMCOLINT: 1
     - _TRANSMODE: 0
+    - _TessellationEdgeLength: 50
+    - _TessellationUniform: 1
     - _TexturePatternStyle: 0
     - _TransAffSha: 1
+    - _TransitionPower: 0.22
+    - _TransitionScale: 0.73
+    - _TransparencyValue: 1
     - _TransparentThreshold: 0
+    - _USEINTER: 0
+    - _USERT: 1
+    - _USEWC: 1
+    - _UpVector: 1
+    - _UseAmbientLight: 1
     - _UseSecondaryCutout: 0
+    - _UseSunReflection: 1
     - _UseTLB: 0
+    - _UseVR: 0
     - _VertexColorBlueAffectOutlineWitdh: 0
     - _VertexColorGreenControlSelfShadowThreshold: 0
     - _VertexColorRedControlSmoothObjectNormal: 0
@@ -319,23 +534,47 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BotColor: {r: 0.71, g: 0.87, b: 0.91, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _CustomLightDirection: {r: 0, g: 0, b: 10, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _FogDirection: {r: 1, g: 0.3, b: 2, a: 0}
     - _GlossColor: {r: 1, g: 1, b: 1, a: 1}
     - _Glow_Color: {r: 1, g: 1, b: 1, a: 1}
     - _HighlightColor: {r: 1, g: 1, b: 1, a: 1}
-    - _MainColor: {r: 0.27661088, g: 0.32834285, b: 0.5283019, a: 1}
+    - _IceTint: {r: 0.13999996, g: 0.34999996, b: 0.49, a: 1}
+    - _IceTrail: {r: 0.39999998, g: 0.09999997, b: 0.01, a: 1}
+    - _MainColor: {r: 0.32778567, g: 0.42037895, b: 0.5471698, a: 1}
+    - _MountColor: {r: 0.11999995, g: 0.11999995, b: 0.12099997, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _OutlineOffset: {r: 0, g: 0, b: 0, a: 1}
     - _OverallShadowColor: {r: 0, g: 0, b: 0, a: 1}
     - _PTCol: {r: 0, g: 0, b: 0, a: 1}
+    - _ParalaxColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ParallaxStrength: {r: -1.04, g: 0.125, b: -0.13, a: 0.1}
+    - _ProjectedShadowColor: {r: 0.16999996, g: 0.56, b: 0.09999997, a: 1}
+    - _ReflectionColor: {r: 0, g: 0.09999997, b: 0.14999998, a: 0.8}
+    - _RimColor: {r: 0.03, g: 0.03, b: 0.03, a: 0}
     - _RimLightColor: {r: 1, g: 1, b: 1, a: 1}
     - _SSAOColor: {r: 0, g: 0, b: 0, a: 0}
     - _SelfLitColor: {r: 1, g: 1, b: 1, a: 1}
     - _SelfShadowRealTimeShadowColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShadowTColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+    - _Specular0: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular1: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular2: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular3: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular4: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular5: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular6: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular7: {r: 1, g: 1, b: 1, a: 1}
+    - _Splat4_STn: {r: 1, g: 1, b: 0, a: 1}
+    - _Splat5_STn: {r: 1, g: 1, b: 0, a: 1}
+    - _Splat6_STn: {r: 1, g: 1, b: 0, a: 1}
+    - _Splat7_STn: {r: 1, g: 1, b: 0, a: 1}
+    - _TerrainScale: {r: 1, g: 1, b: 0, a: 1}
+    - _TransitionColor: {r: 1, g: 1, b: 1, a: 1}
     - _XYZPosition: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &2207999455126963280
