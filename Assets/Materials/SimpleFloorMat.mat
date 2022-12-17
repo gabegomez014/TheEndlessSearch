@@ -8,20 +8,20 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: SimpleFloorMat
-  m_Shader: {fileID: 4800000, guid: 06aa19b87b8aa174485b5a0ed989e1cb, type: 3}
+  m_Shader: {fileID: 4800000, guid: 6459b2db96a08ca41b0f9b39dc7ad59e, type: 3}
   m_ValidKeywords:
-  - USE_AL
-  - USE_LS
-  - USE_RT
-  - USE_WC
-  m_InvalidKeywords:
   - N_F_EAL_ON
   - N_F_O_ON
   - N_F_RDC_ON
   - N_F_RELGI_ON
   - N_F_SS_ON
-  - N_F_TRANSAFFSHA
   - N_F_TRANSAFFSHA_ON
+  m_InvalidKeywords:
+  - N_F_TRANSAFFSHA
+  - USE_AL
+  - USE_LS
+  - USE_RT
+  - USE_WC
   - _CUSTOMLIGHTDIRECTIONFOLLOWOBJECTROTATION_OFF
   - _GIFLATSHADE_OFF
   - _GLOSSTEXTUREFOLLOWOBJECTROTATION_OFF
