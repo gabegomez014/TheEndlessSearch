@@ -6,7 +6,7 @@ public class SectionManager : MonoBehaviour
 {
     public static SectionManager Instance {get; private set;}
 
-    public Transform Player;
+    public PlayerController Player;
 
     private int _currentSection;
 
@@ -31,6 +31,7 @@ public class SectionManager : MonoBehaviour
     IEnumerator ChangeSection(int section, Transform entryPoint) {
         StartCoroutine(GameUIManager.Instance.BlackScreenFadeIn());
         yield return new WaitForSeconds(GameUIManager.Instance.FadeTime);
+        Player.enabled = false;
 
         this.transform.GetChild(_currentSection).gameObject.SetActive(false);
         this.transform.GetChild(section).gameObject.SetActive(true);
@@ -39,6 +40,7 @@ public class SectionManager : MonoBehaviour
 
         Player.transform.position = entryPoint.position;
         yield return new WaitForSeconds(0.5f);
+        Player.enabled = true;
         StartCoroutine(GameUIManager.Instance.BlackScreenFadeOut());
 
     }
